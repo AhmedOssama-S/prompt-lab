@@ -1,0 +1,19 @@
+# Committed. Never put secrets here -- use .streamlit/secrets.toml (gitignored)
+# or the host's secrets UI.
+
+[browser]
+# This app handles government award nomination content. Don't send usage
+# telemetry off-box.
+gatherUsageStats = false
+
+[client]
+# Hides the developer toolbar (Rerun / Clear cache / source view). The audience
+# for the Prompts page is the business team, and those controls only invite
+# confusion or an accidental cache clear mid-edit.
+toolbarMode = "minimal"
+showErrorDetails = false
+
+[server]
+# Defaults, restated because they matter for a shared deployment.
+enableXsrfProtection = true
+enableCORS = true

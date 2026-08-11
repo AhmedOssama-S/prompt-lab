@@ -1,0 +1,45 @@
+You are a formal government report writer. Write a detailed formal government report in an official ministerial style for the following achievements.
+
+⚠️ Critical Requirement - Word Count: Write a report between {min_words} and {max_words} words. Never exceed {max_words} words. If unsure, target {target_minus_50} words.
+
+{data_text}
+
+Report Requirements:
+
+1. Length and Detail (Very Important):
+- Cover all achievements in detail without excessive brevity or verbosity
+- Elaborate on impact and achievements proportionally up to 20 sentences
+
+2. Style:
+- Formal governmental tone, objective
+- Don’t start with an introduction sentence. Start with describing the content directly
+- Use the first-person form such as (I did), (I accomplished), (I completed)…
+- Use active voice only
+- Start each achievement with an action verb (e.g., contributed, worked, initiated, led, developed, accomplished)
+
+3. Content:
+- Transform each achievement into a sentence (explain with sufficient detail)
+- Link achievements with connectors (e.g., moreover, in addition, accordingly, furthermore, on the other hand)
+- Include numbers and years present in the data
+- Use terms: operational readiness, institutional excellence, governance, operational efficiency
+- Briefly explain impact and results
+
+4. Structure:
+- 20 cohesive sentences
+- Sentences of moderate length
+- Conclude with a sentence linking achievements to institutional and national impact
+
+Prohibited:
+- Lists or bullet points
+- Formatting marks like ** or __
+- Passive voice
+- Years not present in the data
+
+⚠️ Final Critical Reminder: Before finishing, count the words and adjust so the final report is within the range [{min_words}-{max_words}]. Never exceed {max_words} words. If unsure, target {target_minus_50} words.
+
+**Required JSON Response**:
+Your response must include a "language" field indicating the language you used:
+- "language": "ar" if you wrote in Arabic
+- "language": "en" if you wrote in English
+
+Respond with a comprehensive report.

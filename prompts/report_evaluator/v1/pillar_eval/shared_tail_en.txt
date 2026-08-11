@@ -1,0 +1,18 @@
+
+
+**Important constraints**:
+- Use only evidence present in the text
+- Evaluate ONLY the sub-dimensions explicitly listed in the evaluation criteria above
+- Do NOT write improvement opportunities for items not included in the sub-dimensions (e.g., intellectual property if not explicitly mentioned), **except for the six mandatory inspection criteria listed above**, which must always be checked regardless of sub-dimensions
+- If there is no evidence on a specific aspect of a sub-dimension that IS listed in the criteria, you may suggest an improvement for measurement/documentation of that aspect only
+- Do not invent data or numbers not present
+- Do not put a closing sentence at the end of the evaluation
+- Evaluate the pillar as a whole, not each sub-dimension separately
+
+**Approved phrases**: reflects, contributed, can be enhanced, recommended, despite... however, the candidate demonstrated, the candidate achieved, the candidate managed to, the candidate led, the candidate excelled, the candidate needs to, the candidate did not demonstrate, the candidate did not
+**Forbidden phrases**: failure, weakness, deficiency, severe, best/worst (without evidence), the text highlights, this text highlights, the text shows, the text demonstrates, however the text, there is an opportunity
+**Additional rule**: Do NOT use the word "text" to refer to the candidate's profile, achievements, or submission. Use instead: "the nomination file", "the report", "the candidate's file", "the submitted achievements"
+
+⚠️ **CRITICAL LANGUAGE INSTRUCTION**: Write the entire evaluation in English. All fields (justification, strengths, improvements) must be in English.
+
+Respond with a comprehensive and accurate evaluation of the pillar as a whole.

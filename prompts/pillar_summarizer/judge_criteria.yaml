@@ -1,0 +1,156 @@
+# Judge rubric for Pillar Summarizer (Auto-Judge, runs inline on Compare).
+# Derived from the rule checklists inside the prompt templates themselves --
+# see PHASE2_PLAN.md section 2.7.
+#
+# Unlike Attempt Comparator, the prompt text here DOES differ between v1 and
+# v2, so several of these criteria are genuine version differentiators rather
+# than shared quality bars. Where a rule exists only in v2's prompt, that is
+# noted -- the judge should still score both sides against it, since the point
+# is to find out whether v2's added instruction actually changed the output or
+# merely added words. A v1 output that already satisfies a v2-only rule is
+# evidence that instruction was unnecessary; a v2 output that violates one it
+# explicitly states is a stronger failure than v1 violating a rule it was
+# never given.
+
+word_count_discipline:
+  description: >
+    Did the output land inside the required range on its own, without needing
+    the retry loop to correct it? Score the FINAL text against the target
+    range, but weight convergence too: a version that lands in range on
+    attempt 1 is better than one that only gets there after the mechanical
+    final-retry edit, even if both end up in range. Use the attempt trajectory
+    supplied with each side, not just the final word count.
+
+banned_negative_framing:
+  description: >
+    Does the text avoid deficit/failure framing about the candidate -- words
+    like فشل, ضعف, قصور, نقص (failure, weakness, deficiency, shortfall) applied
+    to the person's own performance? These summaries are award nominations;
+    naming a challenge the candidate ADDRESSED is fine, characterising the
+    candidate as deficient is not.
+
+active_voice_only:
+  description: >
+    Is every sentence in the active voice? Passive constructions ("تم إنجاز",
+    "was implemented") are explicitly prohibited by both versions' prompts.
+
+first_person_narrative:
+  description: >
+    Is the report written in the first person (قمت / أنجزت / أتممت, or
+    "I established" / "I led")? v2 additionally forbids third-person
+    ("المرشح" / "the candidate") outright -- flag any third-person reference,
+    and note which version produced it.
+
+no_fabricated_facts:
+  description: >
+    Are all numbers, years, awards, entities, programs, and partnerships
+    present in the source rows? Penalize any invented figure or date. v2
+    states this explicitly and at length; v1 only forbids "years not present
+    in the data", so a v1 output inventing a non-year fact is a weaker
+    violation of its own instructions but an equally real quality problem.
+
+semantic_breaks_preserved:
+  description: >
+    On retry and final-retry outputs, are the literal \n paragraph markers
+    from the previous attempt preserved? Both versions' retry prompts require
+    this. Only applicable when the run actually went past attempt 1 -- skip
+    otherwise rather than penalizing.
+
+sentence_count_discipline:
+  description: >
+    v2-specific: v2's prompt caps the report at 15 sentences (12-15 preferred)
+    and states fewer, denser sentences are better. v1 asks for 20. Count the
+    sentences in each side and report both against v2's stricter bar, so the
+    effect of that instruction is visible rather than assumed.
+
+impact_ordering:
+  description: >
+    v2-specific: are achievements ordered strongest/most-measurable first,
+    descending? v1 gives no ordering instruction at all. Check whether v1's
+    output happens to be well-ordered anyway.
+
+number_impact_pairing:
+  description: >
+    v2-specific: is each key number paired with its effect ("from 180 to 60
+    minutes") rather than stated bare, and kept to one tight clause rather
+    than expanded across several sentences?
+
+no_unstated_qualifiers:
+  description: >
+    v2-specific: does the text avoid adding qualifiers absent from the source
+    (e.g. "among its peers", "unprecedented") and avoid claiming national or
+    international impact without explicit evidence of adoption or
+    dissemination? A location word or identity phrase is not scope evidence.
+
+json_key_compliance:
+  description: >
+    Did the model return the report under the exact key "summary"? v2's prompt
+    shows the literal JSON shape and names the key; v1's does not. If a side's
+    output had to be rescued by the alternate-key rename (this is reported per
+    side), that is a real instruction-following failure -- score it as such
+    even though the run succeeded.
+
+# --- rev.3 business acceptance-criteria additions (PDCA Management
+# Consultancy, Aug 2026) -- see Medals_AI_UC3_UC4_Business_Acceptance_Criteria_2.html
+# and "Use Case #3 - Improved" rev.3. These are the business team's own
+# sign-off bar, not an engineering inference from the prompt text -- score
+# both v1 and v2 against them even where neither version's stored prompt was
+# written to satisfy them. A gap here is a real finding about how far
+# production has drifted from what's now wanted, not a false failure.
+
+paragraph_impact_lead_in:
+  description: >
+    S4. Does each paragraph open with a short sentence stating the effect on
+    the organization ("Moreover, in 2025 I contributed to...") BEFORE the
+    figures, rather than leading with a bare number or achievement name?
+
+paragraph_transitions:
+  description: >
+    S2. Does every paragraph after the first open with a formal connector
+    tying it to what precedes it (Moreover / In addition / Consequently / On
+    the other hand, or the Arabic equivalents)? A paragraph that starts cold,
+    with no connector, fails this even if its content is otherwise fine.
+
+paragraph_balance_and_consistency:
+  description: >
+    S1 + S3. Are paragraph lengths within +/-30% of the mean, with the
+    longest no more than 2x the shortest -- and is the quality/depth bar the
+    same across paragraphs, with none noticeably weaker than the others?
+    Exception (A1): a figure-rich year's paragraph running longer than the
+    band is NOT a violation if shortening it would drop a figure -- check
+    figure_traceability below before penalizing length here.
+
+figure_traceability:
+  description: >
+    S5 + A1 + A4. Does every input row's year and ALL of its figures appear
+    in the output, with nothing dropped when same-year rows are merged? For a
+    row with fewer figures than expected, does the output state only what's
+    present rather than inventing one to fill a gap? On any tension with
+    paragraph balance (S3), traceability must win -- a summary that drops a
+    real figure to keep paragraphs even is a worse failure than one that runs
+    long.
+
+chronological_ordering_stability:
+  description: >
+    S7. Are achievements ordered chronologically ascending by year, and is
+    that ordering identical across repeated runs on the same input? NOTE:
+    this directly conflicts with v2's actual stored instruction ("Order
+    achievements by impact: strongest and most measurable first" --
+    prompts/pillar_summarizer/v2/overall_en.txt) -- v2 is expected to fail
+    this by design, since it was written to do the opposite. Score both sides
+    anyway: it's evidence of how far v2's real behavior has drifted from what
+    the business now wants, not a bug in v2's instruction-following.
+
+closing_and_forward_look:
+  description: >
+    S7 (closing requirement). Does the summary close with an explicit
+    alignment to UAE Vision 2031, followed by one forward-looking first-person
+    sentence? Already present in v2's stored prompt (both languages) -- v1
+    has no such instruction, so a v1 output satisfying this anyway is a
+    stronger signal than v2 doing so.
+
+overall_quality:
+  description: >
+    Holistic judgment: which summary would a government excellence committee
+    find more readable, better grounded in the source rows, and more
+    appropriate in tone for an official nomination file?

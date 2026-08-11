@@ -1,0 +1,69 @@
+# Judge rubric for Attempt Comparator (Auto-Judge, runs inline on Compare).
+# Derived directly from the rule checklist inside main_prompt.txt itself --
+# see PROMPT_LAB_PLAN.md / PHASE2_PLAN.md section 1.7. Applies equally to
+# both sides -- the prompt text is byte-identical between v1 and v2 for this
+# use case (see schemas/SCHEMAS.md provenance note), so none of these are a
+# v1-vs-v2 differentiator; they're just what a good comparison looks like.
+
+grounding:
+  description: >
+    Does the output use ONLY facts present in the inputs? Penalize invented
+    numbers, results, awards, partnerships, dates, or entities not present
+    in the achievements being compared.
+
+no_false_scope:
+  description: >
+    Does the output avoid claiming national/regional/international impact
+    unless an achievement gives explicit evidence of dissemination or
+    adoption? A location word (e.g. "UAE") or identity phrase (e.g. "first
+    Emirati") alone is NOT valid scope evidence.
+
+verbatim_facts:
+  description: >
+    Are names, numbers, awards, programs, and dates quoted exactly as
+    written in the inputs, with no embellishment?
+
+pioneering_awareness:
+  description: >
+    Does the output avoid demanding performance numbers from a pioneering /
+    "first-of-its-kind" input (pioneering nature alone should be enough),
+    while still expecting clear quantitative figures for operational inputs?
+    Does it correctly classify each input as pioneering, operational,
+    strategic, or foundational rather than treating them all the same way?
+
+concrete_anchoring:
+  description: >
+    Does every point in individual_analysis include a concrete anchor from
+    that specific input -- a named program/committee/system, a number with
+    its unit, an institution, a date, a specialty, or an award -- rather
+    than a generic observation that could apply to any input?
+
+differentiation_clarity:
+  description: >
+    When two inputs are close in quality, does the output explicitly state
+    the deciding factor, rather than asserting a winner without justification?
+
+terminology_consistency:
+  description: >
+    Does the output refer to each achievement consistently -- by its actual
+    title when titles were available, or consistently as "Input N" /
+    "المُدخل N" when they weren't -- without mixing the two styles or
+    inventing a label not licensed by the terminology rule actually in force
+    for this run?
+
+no_rank_word:
+  description: >
+    Does the output avoid the word "الرتبة" ("rank") anywhere, presenting
+    the final ranking as a plain numbered list instead?
+
+record_id_validity:
+  description: >
+    Does the returned record_id correspond to one of the achievements
+    actually presented in the input (by id or by matching title), rather
+    than an invented or mismatched identifier?
+
+overall_quality:
+  description: >
+    Holistic judgment: which output would a human government-excellence
+    evaluator find more precise, better-grounded, and more decisive, all
+    else equal?

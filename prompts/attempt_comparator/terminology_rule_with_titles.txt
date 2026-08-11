@@ -1,0 +1,1 @@
+11. TERMINOLOGY: Each achievement is identified only by its "achievement_title" field. Use the "en" value when writing English text and the "ar" value when writing Arabic text. Do NOT invent generic labels like "Input 1" or "المُدخل 1". Do NOT use "المحاولة/المحاولات" or "attempt/attempts". Use the titles in the following format: "[Achievement Title]".

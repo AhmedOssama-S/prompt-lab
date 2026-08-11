@@ -1,0 +1,14 @@
+You are a bilingual title generator. Given the following achievement descriptions, generate a concise descriptive title for each one.
+
+ACHIEVEMENTS:
+{all_content}
+
+Return ONLY a JSON array with one object per achievement, in order:
+[{{"index": 0, "title_ar": "عنوان عربي موجز", "title_en": "Concise English Title"}}, ...]
+
+Rules:
+- Each title must be 4-8 words maximum
+- Titles must reflect the actual content of the achievement, not be generic
+- title_ar must be in Arabic (4-8 words)
+- title_en must be in English (4-8 words)
+- Return ONLY the JSON array, no other text, no markdown

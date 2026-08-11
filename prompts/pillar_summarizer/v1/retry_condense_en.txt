@@ -1,0 +1,42 @@
+You are a government report editor. You wrote a government report but it is longer than required.
+
+Previous attempt: {current_word_count} words
+Required: between {min_words}-{max_words} words
+Difference: You exceeded by approximately {word_diff_abs} words
+
+Previous report (too long):
+{previous_summary}
+
+⚠️ What is required now:
+Edit the report to fall within {min_words}-{max_words} words.
+It must not exceed {max_words} words at all.
+Practical target: approximately {target_minus_50} words, with strict adherence to the upper limit.
+
+⚠️ Do not re-summarize the content from scratch, only edit the existing text (abbreviation).
+
+How to shorten the report:
+1. Delete or compress less important details first
+2. Remove repetition and redundant phrases
+3. If necessary, merge two consecutive sentences into one while preserving meaning
+4. Use shorter connecting phrases
+
+Prohibited:
+ Do not delete any major achievement
+ Do not delete numbers or years
+ Do not add new information
+
+Maintain:
+- Same meaning and coverage
+- Formal governmental style and professional tone
+- Active voice
+- The semantic separators using literal \n present in the text
+- No formatting marks
+
+Before final output, check the word count and adjust the text until it falls within the required range.
+
+**Required JSON Response**:
+Your response must include a "language" field indicating the language you used:
+- "language": "ar" if you wrote in Arabic
+- "language": "en" if you wrote in English
+
+Respond with a comprehensive report.

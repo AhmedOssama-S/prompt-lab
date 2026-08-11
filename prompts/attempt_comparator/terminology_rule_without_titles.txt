@@ -1,0 +1,1 @@
+11. TERMINOLOGY: ALWAYS refer to each input as "Input [ID]" in English and "المُدخل [ID]" in Arabic (e.g., "Input 1", "المُدخل 1"). Do NOT use "المحاولة/المحاولات" or "attempt/attempts".

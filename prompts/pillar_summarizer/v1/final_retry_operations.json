@@ -1,0 +1,26 @@
+{
+  "reduce": {
+    "ar": {
+      "le40": "احذف جملتين كاملتين، أو ادمج جملتين متجاورتين في واحدة",
+      "le80": "احذف أربع جمل كاملة (الأقل أهمية)",
+      "gt80": "اضغط كل جملة بإيجاز + احذف أربع جمل كاملة"
+    },
+    "en": {
+      "le40": "Delete two complete sentences, or merge two adjacent sentences into one",
+      "le80": "Delete four complete sentences (the least important)",
+      "gt80": "Compress each sentence concisely + delete four complete sentences"
+    }
+  },
+  "expand": {
+    "ar": {
+      "le30": "أضف جملة واحدة فقط تشرح الأثر المؤسسي (دون مواضيع جديدة)",
+      "le70": "أضف جملتين فقط تشرحان الأثر المؤسسي والوطني (دون مواضيع جديدة)",
+      "gt70": "وسّع جملتين موجودتين + أضف جملتين جديدتين عن الأثر المؤسسي"
+    },
+    "en": {
+      "le30": "Add only one sentence explaining institutional impact (without new topics)",
+      "le70": "Add only two sentences explaining institutional and national impact (without new topics)",
+      "gt70": "Expand two existing sentences + add two new sentences about institutional impact"
+    }
+  }
+}

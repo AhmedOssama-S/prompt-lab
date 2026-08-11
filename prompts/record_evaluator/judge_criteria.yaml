@@ -1,0 +1,83 @@
+# Judge rubric for Record Evaluator (Auto-Judge page)
+# Derived directly from the rule checklist inside v1.txt / v2.txt itself,
+# not invented separately — see PROMPT_LAB_PLAN.md section 6.5 / 7.
+#
+# Each key becomes one custom criterion passed to the LangChain pairwise
+# evaluator: {name: description}. Descriptions are phrased as yes/no
+# compliance checks so the judge scores rule-adherence, not just "vibes".
+
+grounding:
+  description: >
+    Does the output use ONLY facts explicitly present in the input content?
+    Penalize invented numbers, results, awards, partnerships, dates,
+    technologies, or entities not present in the source content.
+
+no_false_scope:
+  description: >
+    Does the output avoid claiming national/regional/international impact
+    unless the content gives explicit evidence of dissemination or adoption?
+    A location word (e.g. "UAE") or identity phrase (e.g. "first Emirati")
+    alone is NOT valid scope evidence — flag any output that treats it as such.
+
+verbatim_facts:
+  description: >
+    Are names, numbers, awards, programs, and dates quoted verbatim as they
+    appear in the source content, with no embellishment or added qualifiers?
+
+banned_phrases:
+  description: >
+    Does the output avoid the specific banned phrase "يبرز النص" (or English
+    equivalents like "the text highlights") and avoid referring to the
+    candidate's submission as "النص" ("the text")? Approved alternatives are
+    "هذا الترشيح" / "هذا المرشح" ("the nomination file" / "the candidate").
+
+no_title_colon_opening:
+  description: >
+    Does every strength and improvement point start directly with content,
+    with NO short title or header followed by a colon before it?
+
+candidate_focused_opening:
+  description: >
+    Do strength points begin with a candidate-focused summary phrase such as
+    "أظهر المرشح..."، "حقق المرشح..."، "تمكّن المرشح من..." (or English
+    equivalents like "The candidate demonstrated...")?
+
+two_facet_construction:
+  description: >
+    Does each point combine two facets — for strengths: (what the candidate
+    did) + (why it matters in context); for improvements: (what is missing)
+    + (what its absence costs the evaluation)? Single-facet, generic points
+    should be penalized.
+
+concrete_anchor:
+  description: >
+    Does every strength point include a concrete anchor (a named
+    program/system/committee, institution, specialty, or date), with every
+    number paired with its effect (e.g. "بنسبة X%", "من 180 إلى 60 دقيقة")?
+
+depth_calibration:
+  description: >
+    Is the number of points proportional to the achievement type — 2
+    concise points for a routine/foundational item, 3-4 deeper points for a
+    pioneering/exceptional one? Does it correctly avoid demanding
+    performance numbers from a pioneering "first-of-its-kind" item while
+    still expecting them for an operational item?
+
+recommendations_build_on_strengths:
+  description: >
+    Do recommendations build forward on a stated strength as a future step,
+    rather than re-wording an already-listed area for improvement? Do they
+    stay within the individual candidate's own scope of influence (not
+    institutional-level strategy)?
+
+json_validity:
+  description: >
+    Is the output a single valid JSON object (no markdown wrapper, no
+    asterisks/formatting marks) containing both arabic_analysis and
+    english_analysis, each with strengths, areas_for_improvement, and
+    recommendations arrays?
+
+overall_quality:
+  description: >
+    Holistic judgment: which output would a human government-excellence
+    evaluator find more useful, precise, and well-grounded, all else equal?

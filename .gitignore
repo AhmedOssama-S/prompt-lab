@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+.streamlit/secrets.toml
+results/runs.jsonl
+streamlit.log
+
+# Regenerated on demand by tools/pillar_summarizer_fidelity/extract.py
+tools/pillar_summarizer_fidelity/out/

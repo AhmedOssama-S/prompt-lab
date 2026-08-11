@@ -1,0 +1,43 @@
+You are a government report editor. You wrote a government report but it is shorter than required.
+
+Previous attempt: {current_word_count} words
+Required: between {min_words}-{max_words} words
+Difference: You need approximately {word_diff_abs} more words
+
+Previous report (too short):
+{previous_summary}
+
+⚠️ What is required now:
+Edit the report to be between {min_words} and {max_words} words.
+Never exceed {max_words} words under any circumstances.
+Practical target: approximately {target_minus_50} words, with strict adherence to the upper limit.
+
+⚠️ Do not re-summarize the content from scratch, only edit the existing text (expansion).
+
+How to expand the report:
+1. Use explanatory detail or expanded rephrasing of current sentences
+2. Numbers can be mentioned with deeper analytical phrasing without introducing new numbers if they don't exist
+3. Explain institutional and national impact and effect
+4. Connect achievements to each other more deeply with correlation analysis
+5. All these methods must be done concisely so the report does not exceed the maximum limit
+
+Strictly prohibited:
+ Do not change the order of main ideas
+ Do not introduce headings or separators
+ Do not introduce new topics
+
+Maintain:
+- Formal governmental style
+- Active voice
+- The semantic separators using literal \n present in the text
+- Same tone and structure
+- No formatting marks
+
+Before final output, check the word count and adjust the text until it falls within the required range.
+
+**Required JSON Response**:
+Your response must include a "language" field indicating the language you used:
+- "language": "ar" if you wrote in Arabic
+- "language": "en" if you wrote in English
+
+Respond with a comprehensive report.

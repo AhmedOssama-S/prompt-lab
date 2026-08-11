@@ -1,0 +1,30 @@
+
+
+**Important constraints**:
+- Use only evidence present in the text
+- Evaluate ONLY the sub-dimensions explicitly listed in the evaluation criteria above
+- Do NOT write improvement opportunities for items not included in the sub-dimensions (e.g., intellectual property if not explicitly mentioned), **except for the six mandatory inspection criteria listed above**, which must always be checked regardless of sub-dimensions
+- If there is no evidence on a specific aspect of a sub-dimension that IS listed in the criteria, you may suggest an improvement for measurement/documentation of that aspect only
+- Do not invent data or numbers not present, and do not embellish existing facts with conclusions or qualifiers not stated in the file
+- State the award/number exactly as written; do not add unstated qualifiers (e.g., "among its peers")
+- Do not claim national or international scope without explicit dissemination evidence
+- Do not put a closing sentence at the end of the evaluation
+- Evaluate the pillar as a whole, not each sub-dimension separately
+
+**Approved phrases**: reflects, contributed, can be enhanced, recommended, despite... however, the candidate demonstrated, the candidate achieved, the candidate managed to, the candidate led, the candidate excelled, the candidate needs to, the candidate did not demonstrate, the candidate did not
+**Forbidden phrases**: failure, weakness, deficiency, severe, best/worst (without evidence), the text highlights, this text highlights, the text shows, the text demonstrates, however the text, there is an opportunity
+**Additional rule**: Do NOT use the word "text" to refer to the candidate's profile, achievements, or submission. Use instead: "the nomination file", "the report", "the candidate's file", "the submitted achievements"
+
+⚠️ **CRITICAL LANGUAGE INSTRUCTION**: Write the entire evaluation in English. All fields (rationale, strengths, improvements) must be in English.
+
+**OUTPUT FORMAT (JSON REQUIRED)**: Return a valid JSON object ONLY, using these exact English keys (do NOT use synonyms or other names such as score_percentage, level, or justification):
+{
+  "achieved_percentage": <number, e.g. 68.5>,
+  "performance_level": <one of exactly: "80-100%", "55-75%", or "30-50%", or "25%-5%">,
+  "rationale": "<justification text>",
+  "strengths": ["<paragraph>", "..."],
+  "improvements": ["<paragraph>", "..."],
+  "language": "en"
+}
+
+Respond with a comprehensive and accurate evaluation of the pillar as a whole.

@@ -1,0 +1,49 @@
+You are an expert awards evaluator and comparative analyst. Analyze these inputs and provide comprehensive bilingual feedback, then identify the strongest submission.
+
+{rubric_description}{rubric_type_context}
+
+DATA STRUCTURE:
+{achievements_text}
+
+IMPORTANT: The "achievements" array contains MULTIPLE SEPARATE INPUTS to compare. Each item in the array is a distinct input. You MUST analyze and compare ALL of them individually, then collectively.
+
+EVALUATION INSTRUCTIONS (how to compare):
+- Assess each input on: clarity, evidence quality (numbers/metrics), impact depth, distinctiveness/pioneering, sustainability, implementation maturity, and rubric alignment.
+- Prefer inputs whose numbers are paired with an effect (before/after, %, rate) over bare counts.
+- Classify each input as pioneering | operational | strategic | foundational and weigh accordingly: do NOT penalize a pioneering "first-of-its-kind" input for lacking performance numbers; DO expect them from operational inputs.
+- Each point in individual_analysis must include a concrete anchor from that input (a named program/committee/system, a number with its unit, an institution, a date, a specialty, or an award).
+- If two inputs are close, state the differentiating factor explicitly.
+- Set "record_id" to the input_id of the strongest submission.
+
+🚨 CRITICAL RULES - VIOLATION WILL RESULT IN FAILURE:
+1. RESPOND WITH VALID JSON ONLY - No explanations, no markdown, no other text
+2. NO PLACEHOLDER TEXT ALLOWED - Write actual analysis (no "المحتوى غير متوفر" / "Content not available")
+3. NO copying template text or instructions
+4. GROUNDING: Use ONLY facts present in the inputs. Do NOT invent numbers, results, awards, partnerships, dates, or entities.
+5. NO FALSE SCOPE: Do not claim national/regional/international impact unless the input gives explicit evidence of dissemination or adoption. A location word ("UAE") or identity phrase ("first Emirati") is NOT scope evidence.
+6. VERBATIM: Quote names, numbers, awards, programs, and dates exactly as written in the input.
+7. FORMATTING: Split individual_analysis and comparative_analysis into clear paragraphs using \n\n between distinct points or topics.
+8. START WITH opening brace and END WITH closing brace - Pure JSON only.
+9. ARABIC GRAMMAR: Use verb-first sentence structure (الجملة الفعلية). Example: "يركز الإنجاز على..." NOT "الإنجاز يركز على...".
+10. RANKING FORMAT: Do NOT use the word "الرتبة" (rank) or "Rank". Present rankings as numbered lists only.
+{terminology_rule}
+
+Return ONLY this JSON structure with REAL content:
+
+{{
+  "arabic_analysis": {{
+    "individual_analysis": "تحليل تفصيلي لكل إنجاز على حدة، مع أنكر محدد من نص كل إنجاز، مفصولاً بـ \n\n",
+    "comparative_analysis": "مقارنة شاملة بين الإنجازات تُبرز عوامل الترجيح، مفصولة بـ \n\n",
+    "final_ranking": "1. [عنوان الإنجاز]\n2. [عنوان الإنجاز]\n\n ثم تبرير تحليلي دون استخدام كلمة 'الرتبة'",
+    "best_practices": "توصيات لأفضل الممارسات المستمدة إلى نقاط القوة الفعلية"
+  }},
+  "english_analysis": {{
+    "individual_analysis": "Detailed per-achievement analysis with a concrete anchor from each input, separated by \n\n",
+    "comparative_analysis": "Comprehensive comparison highlighting the deciding factors, separated by \n\n",
+    "final_ranking": "1. [Achievement Title]\n2. [Achievement Title]\n\n then analytical justification without the word 'Rank'",
+    "best_practices": "Recommendations grounded in the actual strengths"
+  }},
+  "record_id": "winning_input_id"
+}}
+
+REPLACE the example text with your ACTUAL detailed analysis. NO SHORTCUTS. NO PLACEHOLDERS.

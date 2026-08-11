@@ -1,0 +1,142 @@
+# Judge rubric for Report Evaluator (Auto-Judge page)
+# Derived directly from the rule checklist inside v1/ and v2/ prompt files
+# themselves — see PROMPT_LAB_PLAN.md section 6.5 / 7.
+#
+# v2-specific criteria (no_false_scope, no_embellishment) are included here
+# too since the judge's job is precisely to notice when v1 lacks a
+# protection that v2 added — do not drop them just because v1 can't satisfy them.
+
+percentage_justification:
+  description: >
+    Is the achieved_percentage an exact, specific number (e.g. 68.5, not a
+    round 70) with a rationale (2-3 lines) that actually explains why that
+    number was chosen, referencing the sub-dimensions and their weights?
+
+no_false_scope:
+  description: >
+    Does the output avoid raising the percentage or claiming national/
+    international impact merely because of a location word (e.g. "the UAE")
+    or identity phrase (e.g. "first Emirati")? Any such claim should require
+    explicit dissemination evidence (published policy, federal decision, or
+    adoption by another entity). This is an explicit v2 addition — flag it
+    as a real difference if v1's output makes an unsupported scope claim
+    that v2 avoids, or vice versa.
+
+no_embellishment:
+  description: >
+    Are names, numbers, awards, and dates preserved verbatim with no added
+    interpretive qualifiers (e.g. "among its peers", "first of its kind")
+    unless explicitly stated in the source text? This is an explicit v2
+    addition — treat added qualifiers as a real defect regardless of version.
+
+achievement_type_awareness:
+  description: >
+    Does the output avoid demanding performance numbers from a pioneering /
+    "first-of-its-kind" achievement (pioneering nature alone is sufficient),
+    while still expecting clear quantitative figures for operational
+    achievements?
+
+no_title_colon_opening:
+  description: >
+    Do strength and improvement paragraphs start directly with content, with
+    NO short title followed by a colon before it?
+
+banned_phrases:
+  description: >
+    Does the output avoid "يبرز النص"/"the text highlights" and similar
+    banned phrases, and avoid using "النص"/"the text" to refer to the
+    candidate's file? Approved alternatives: "ملف الترشيح"/"the nomination
+    file", "التقرير"/"the report".
+
+improvement_tone_neutrality:
+  description: >
+    Are improvement opportunities phrased as constructive opportunities
+    (e.g. "يُوصى بـ"/"it is recommended to") rather than criticism (avoid
+    "فشل/ضعف/قصور"/"failure/weakness/deficiency")? Is the banned phrase
+    "توجد فرصة"/"there is an opportunity" avoided?
+
+improvement_individual_scope:
+  description: >
+    Do improvement opportunities stay within the individual candidate's own
+    scope and role, avoiding generic organization-level advice outside what
+    the candidate could personally act on?
+
+mandatory_inspection_coverage:
+  description: >
+    Does the output check all six mandatory inspection items regardless of
+    which sub-dimensions were listed: benchmarking comparisons, linkage to
+    named national/competitive indicators, awards/recognition, quantitative
+    evidence per achievement, future activities/projects per achievement,
+    and pioneering/uniqueness notes per achievement?
+
+pillar_holistic_evaluation:
+  description: >
+    Is the pillar evaluated as a whole (one percentage, one set of
+    strengths/improvements covering all sub-dimensions), rather than
+    scored/discussed sub-dimension by sub-dimension?
+
+json_schema_compliance:
+  description: >
+    Does the output use exactly the required JSON keys (achieved_percentage,
+    performance_level, rationale, strengths, improvements, language), with
+    performance_level being exactly one of "80-100%", "55-75%", "30-50%", or
+    "25%-5%" — no synonyms like score_percentage, level, or justification?
+
+# --- rev.3 business acceptance-criteria additions (PDCA Management
+# Consultancy, Aug 2026) -- see Medals_AI_UC3_UC4_Business_Acceptance_Criteria_2.html
+# and "Use Case #4 - Improved" rev.3. Everything above only scores the
+# pillar-evaluation output; the executive summary was never scored by this
+# rubric at all until the three exec_summary_* criteria below. As with
+# pillar_summarizer's rev.3 additions, score both v1 and v2 against these even
+# where neither version's stored prompt was written to satisfy them.
+
+exec_summary_cross_pillar_synthesis:
+  description: >
+    R1. Does the executive summary synthesize across ALL provided pillars
+    rather than recapping one? With a single pillar supplied, is it still
+    framed as a file-level summary rather than a pillar recap, and does no
+    achievement repeat verbatim across pillars?
+
+exec_summary_context_lead_in:
+  description: >
+    R2. Does the executive summary open with a short contextual sentence
+    (who is being assessed, in which domain) before moving to the strongest
+    achievements, rather than starting cold with a number or achievement?
+
+exec_summary_figures_support_analysis:
+  description: >
+    R3. Is each quoted figure tied to what it demonstrates (maturity, growth,
+    openness) rather than left as a bare number, and does the summary avoid
+    stating any evaluation score or percentage directly (scores belong in the
+    pillar evaluation, not the summary)?
+
+rationale_distinctness:
+  description: >
+    R6. Is the percentage rationale genuinely distinct from strength #1, not
+    a reworded copy of it? The rev.3 implementation notes suggest treating
+    more than ~40% shared phrasing/n-grams between the rationale and
+    strength #1 as a failure. v1/v2's stored prompts already forbid literal
+    copying generally ("لا نسخ حرفي") but neither explicitly targets
+    rationale-vs-strength-1 overlap -- this is a stricter, more specific bar
+    than either version was written against.
+
+strength_improvement_count_discipline:
+  description: >
+    R4 + R5 + A2 (anti-fabrication precedence). Strengths should land in
+    [3, 5] paragraphs and improvements in [4, 6] -- BUT an output that falls
+    short of the minimum while explicitly noting limited supporting evidence
+    should be scored as a PASS, not a violation. Score padding (extra points
+    that don't add real distinct content, just to hit the count) as a worse
+    failure than an honest short count with a stated reason.
+
+missing_figure_handling:
+  description: >
+    A4. When an achievement lacks a quantitative indicator, does the output
+    avoid inventing one, instead framing the gap itself as a specific,
+    actionable improvement opportunity?
+
+overall_quality:
+  description: >
+    Holistic judgment: which output would a human government-excellence
+    evaluator find more precise, better-grounded, and more useful, all else
+    equal?

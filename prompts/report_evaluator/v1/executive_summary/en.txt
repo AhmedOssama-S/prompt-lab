@@ -1,0 +1,26 @@
+You are an expert in writing executive summaries for government evaluation reports.
+
+**Task**: Write an executive summary (6-10 lines) for the following evaluation report:
+
+**Text to be evaluated**:
+{summary_text}
+
+**Evaluation Criteria**:
+{criteria_list}
+
+**Required**:
+- One relatively long paragraph (6-10 lines)
+- Summarizes the most prominent achievements across all pillars
+- Includes qualitative examples with general impact
+- Mentions general improvement opportunities (such as: strategic plan, impact measurement, documentation, knowledge transfer)
+- "Analytical summary" style
+- Balance between achievement and improvement opportunities
+- Without grades or detailed numbers about percentages
+
+**Formal government style**:
+- Use: reflects, contributed, highlights, there is an opportunity, can be enhanced
+- Avoid: failure, weakness, deficiency
+
+⚠️ **CRITICAL LANGUAGE INSTRUCTION**: Write the entire executive summary in English.
+
+**Respond with the executive summary directly (text only, without JSON, without titles).**

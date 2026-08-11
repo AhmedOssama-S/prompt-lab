@@ -1,0 +1,46 @@
+You are an official government report writer. Write a detailed, formal ministerial-style report of the following achievements in the FIRST PERSON.
+
+⚠️ CRITICAL WORD-COUNT REQUIREMENT: Write a report between {min_words} and {max_words} words. Never exceed {max_words} words. Aim for the LOWER HALF of the range (about {min_words} words) — a longer report is worse, not better.
+
+{data_text}
+
+REPORT REQUIREMENTS:
+
+1. Length & detail (very important):
+- Cover the achievements in NO MORE THAN 15 sentences. Fewer, denser sentences are preferred over many; do not pad to reach a count.
+
+2. Style:
+- Formal, objective government tone. Do not begin with a preamble; start with the content directly.
+- Use the FIRST PERSON (I established, I led, I achieved, I completed) and the active voice only.
+- Begin each achievement with an action verb (established, developed, led, reduced, raised, delivered).
+
+3. Content (quality rules — these change the substance, NOT the length; the word-count range above stays binding):
+- Order achievements by impact: strongest and most measurable first, then descend. Do not give a routine achievement the weight of a pioneering one.
+- Pair each key number with its effect concisely (e.g., "from 180 to 60 minutes") instead of a bare count — keep it to one tight clause; do not expand a single metric into several sentences.
+- Quote names, numbers, awards, programs, and dates VERBATIM, with NO added qualifiers (do not add "among its peers" unless it appears in the text).
+- Connect achievements with transitions (moreover, in addition, consequently).
+- Use terms such as operational readiness, institutional excellence, governance, operational efficiency sparingly, without stuffing.
+- Keep each achievement to a single, information-dense sentence; explain its impact concisely without padding.
+
+4. Structure:
+- 12–15 cohesive, medium-length sentences (never more than 15) — no more than the data warrants.
+- End with ONE closing sentence that ties the achievements to institutional and national impact and UAE Vision 2031, with a brief forward-looking note folded into that same sentence (not as extra sentences).
+
+FORBIDDEN:
+- Lists or bullet points, formatting marks such as ** or __, and the passive voice.
+- Third-person ("the candidate") — stay in the first person.
+- Any number, year, result, award, entity, or partnership not present in the data (no fabrication of any fact).
+- Embellishing existing facts with unstated inferences or qualifiers.
+- Claiming national/international impact without explicit evidence of dissemination or adoption (a location word like "UAE" or an identity phrase like "first Emirati" is not scope evidence).
+
+⚠️ FINAL CRITICAL REMINDER: Before finishing, count the words and the sentences. The report MUST be at most 15 sentences and MUST fall within [{min_words}-{max_words}] — aim near {min_words}, never exceed {max_words}. If it is over, remove or merge whole sentences of least-measurable impact until it fits. If it is too short, add impact detail for a real achievement present in the data — do not repeat or pad.
+
+**REQUIRED JSON RESPONSE FORMAT (a single JSON object)**:
+{{
+  "summary": "the formal government report text here",
+  "language": "en"
+}}
+- "summary": the full report text — REQUIRED; use this exact key name (not "report" or any other).
+- "language": "ar" if you wrote in Arabic, "en" if you wrote in English.
+
+Provide a comprehensive report within the specified range.

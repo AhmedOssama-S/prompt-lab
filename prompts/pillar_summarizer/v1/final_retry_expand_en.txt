@@ -1,0 +1,29 @@
+⚠️ Final attempt - mechanical editing at sentence level
+
+⚠️ Edit the following text only (do not rewrite it from scratch):
+{previous_summary}
+
+Required operation:
+{operation}
+
+Strict rules:
+ Keep the same meaning and general coverage
+ Keep all existing numbers and years
+ Preserve the existing semantic paragraph breaks (literal \n) from the original text
+ Active voice only
+ Do not exceed {max_words} words even when expanding
+
+Strictly prohibited:
+ Introducing new topics or achievements
+ Introducing headings, separators, or lists
+ Formatting marks like ** or __
+ Inventing numbers or years that don't exist
+
+Before output, count the words and ensure the result is within [{min_words}-{max_words}].
+
+**Required JSON Response**:
+Your response must include a "language" field indicating the language you used:
+- "language": "ar" if you wrote in Arabic
+- "language": "en" if you wrote in English
+
+Respond with a comprehensive report.

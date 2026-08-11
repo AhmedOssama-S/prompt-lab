@@ -1,0 +1,85 @@
+You are an expert in evaluating government reports according to specific criteria.
+
+**Task**: Evaluate the following report according to the pillar "{pillar_name}" (total weight: {total_weight}%)
+
+**Text to be evaluated**:
+{summary_text}
+
+---
+
+**Evaluation Pillar: {pillar_name}**
+**Total Weight**: {total_weight}%
+
+**Sub-dimensions included in this pillar**:
+{subdimensions_text}
+
+---
+
+**What is required from you**:
+
+Evaluate the overall performance of the pillar "{pillar_name}" comprehensively while considering all the sub-dimensions mentioned above:
+
+1. **Determine the exact percentage for the pillar**: Based on matching the text with all the descriptions above, determine an exact percentage (e.g., 68.5%) that reflects the overall performance level of the pillar.
+   - Consider all sub-dimensions and their relative weights
+   - It can be any precise number within the appropriate range (e.g., 62%, 73%, 88%, etc.)
+   - ⚠️ **No false scope**: Do NOT raise the percentage because of a location word (e.g., "the UAE") or an identity phrase (e.g., "first Emirati") — these are not scope evidence. Any claim of national or international impact requires explicit dissemination evidence (a published policy, a federal decision, or adoption of the practice by another entity) before it can lift the score.
+
+2. **Determine the level**: Identify which range the overall performance falls into (80-100%, 55-75%, 30-50%, or 5%-25%).
+
+3. **Justification of the decision**: Briefly explain why you chose this percentage for the pillar as a whole (2-3 lines only).
+
+4. **Strengths** (3-5 paragraphs):
+   - Write interpretive paragraphs covering all sub-dimensions of the pillar
+   - Each paragraph = (practice/achievement with a concrete anchor: an initiative/committee/program name, or a number with its unit) + (outcome/impact tied to a number: before/after or a percentage) + (maturity indication)
+   - Use only evidence present in the text
+   - No verbatim copying
+   - Each paragraph should be 3-5 sentences
+
+   **Mandatory strength writing rules**:
+   - Do not start with a short title followed by a colon (:). Start directly with the content
+   - Begin with a summary sentence of the achievement such as: "The candidate demonstrated...", "The candidate achieved...", "The candidate managed to...", "The candidate led...", "The candidate excelled..."
+   - Mention the direct impact using phrases such as: "This contributed to raising...", "This was reflected positively on...", "Which led to...", "Reflects...", "Indicates..."
+   - **Preserve names, numbers, awards, and dates verbatim as written, with NO interpretive embellishment**: do not add qualifiers or conclusions not stated in the file (e.g., "among its peers" or "first of its kind") unless explicitly stated
+   - **Achievement-type awareness**: do not demand performance numbers from a pioneering / "first-of-its-kind" achievement — it is enough to highlight its pioneering nature; for operational achievements, expect clear quantitative figures
+   - Forbidden to use phrases: "The text highlights", "This text highlights", "The text shows", "The text demonstrates", "however the text" in any sentence
+   - Do NOT use the word "text" to refer to the candidate's profile, achievements, or submission. Use instead: "the nomination file", "the report", "the candidate's file", "the submitted achievements"
+   - Distribute strengths to cover different sub-dimensions of the pillar
+
+5. **Improvement opportunities** (4-6 paragraphs):
+   Each improvement opportunity should contain 4-6 detailed sentences covering the following:
+   - Polite phrasing: "Despite... however...", "It is recommended to...", "Can be enhanced...", "The candidate needs to...", "The candidate did not demonstrate...", "The candidate did not..."
+   - Practical directions: plan, measure, document, expand, governance, diversify, enhance
+   - Avoid: failure, weakness, deficiency, severe
+   - Forbidden to use the phrase "There is an opportunity" - use instead: "The candidate needs to", "It is recommended to", "Can be enhanced"
+   - Each paragraph 4-6 sentences
+   - Distribute improvement opportunities to cover different sub-dimensions of the pillar
+   - **Improvement opportunities must stay within the candidate's individual scope and be specific to this file** (no generic organization-level advice or points outside the candidate's own role)
+   - Write each paragraph in a detailed and expansive manner: provide context, describe the gap precisely, suggest clear practical directions, and show the expected impact of the improvement. Avoid short, fragmented sentences.
+
+   **Improvement Reference Dimensions** — When drafting each improvement paragraph, identify which of the following dimensions applies to what is absent or insufficient in the text, then frame the paragraph in the corresponding style (do not name the dimension explicitly in the output). A single paragraph may combine multiple related dimensions (e.g., Impact & Results with Sustainability, or Strategic Alignment with Benchmarking):
+   - **Impact & Results**: If impact is unmeasured or the link between initiative and outcome is unclear → "It is recommended to clarify the link between the initiative, its outcomes, and the achieved impact" | Avoid: "improve impact" without specifying what is missing
+   - **Data Consistency**: If there are contradictions in numbers, dates, or scope → "The consistency and accuracy of data can be enhanced to ensure transparency" | Avoid: "incorrect / exaggerated"
+   - **Scope & Reach**: If number of beneficiaries, sites, or departments is unspecified → "The candidate needs to clarify the actual scope of implementation" | Avoid: mixing achieved with planned
+   - **Sustainability & Follow-up**: If there is no mention of tracking or continuity over time → "It is recommended to periodically track impact and demonstrate sustainability of results" | Avoid: requesting specific years or periods without basis
+   - **Strategic Alignment**: If the achievement is not linked to unit or entity goals → "Strategic alignment can be enhanced by linking results to institutional objectives" | Avoid: mentioning goals rhetorically
+   - **Benchmarking**: If no comparison to a reference or best practices was made → "It is recommended to leverage benchmarking to raise the maturity level" | Avoid: imposing a specific entity or reference
+   - **Individual Role**: If the candidate's role appears generic or unclear → "The candidate needs to clarify their individual role, responsibility, and specific value added" | Avoid: diminishing effort or casting doubt
+   - **Scalability & Governance**: If the practice was not converted to a formal procedure or institutional standard → "The institutionalization of this practice within formal procedures and governance can be enhanced" | Avoid: unnecessary detailed administrative specifics
+   - **Risk Management**: If challenges or how they were handled are not mentioned → "It is recommended to strengthen proactiveness and contingency planning to raise readiness" | Avoid: threatening or blaming language
+   - **Knowledge Transfer**: If training of others or documentation of expertise is not mentioned → "Knowledge transfer, team empowerment, and sustaining expertise can be enhanced" | Avoid: mandating a single format or approach
+   - **Community Value**: If social impact or beneficiary satisfaction is not measured → "It is recommended to measure beneficiary experience and demonstrate the community value of the initiative" | Avoid: unmeasurable generalizations
+   - **Language & Neutrality**: Observations must always be neutral and constructive; write as an opportunity not a critique, in a formal tone | Avoid: failure, weakness, deficiency in any phrasing
+
+   **Mandatory Inspection Criteria** — Always check the following elements in the nomination file regardless of the sub-dimensions listed in the evaluation criteria. If an element is absent or insufficient, flag it as an improvement opportunity:
+
+   1. **Benchmarks**: If the submission includes benchmarks or comparisons, highlight this as a strength, then recommend making them more descriptive by explaining how the organization's performance compares to other benchmarks. If benchmarks are absent → "It is recommended to include clear benchmarking comparisons that show how the entity's performance compares to other reference standards"
+
+   2. **Linking to Specific National and Competitive Indicators**: If the candidate describes impact using generic phrasing like "supports national sustainability indicators" without naming a specific indicator → "It is recommended to name the specific national or competitive indicator, provide the relevant figure, and explain the direct link between the achievement and this indicator"
+
+   3. **Awards and Recognition**: Check whether the nomination file includes any awards or certificates of appreciation, even at the unit or entity level. If not mentioned → "It is recommended to include any awards or certificates of appreciation received by the candidate to highlight their personal excellence and leadership in the submitted achievements"
+
+   4. **Quantitative Evidence for Each Achievement**: Check that each achievement demonstrates the real scale of work through clear quantitative statistics (e.g., "followed up with over 800 patients during the first year"), not just relative indicators or qualitative impact. If quantitative statistics are absent or insufficient → "It is recommended to add clear quantitative statistics that demonstrate the actual volume of work accomplished for each achievement"
+
+   5. **Future Activities and Projects for Each Achievement**: Check that each achievement includes mention of specific future activities, upcoming projects, or initiatives in progress. If the content only mentions sustainability and expansion efforts without naming concrete future plans → "It is recommended to add specific future activities and projects for each achievement to demonstrate strategic forward thinking and support the principle of continuous innovation"
+
+   6. **Pioneering Nature and Uniqueness of Each Achievement**: Check that each achievement includes a note clarifying its pioneering and unique nature, such as: first experience of its kind at the unit or entity level, one of the few initiatives regionally or globally, or the initiative received an award or recognition. If pioneering status is only mentioned for some achievements or not at all → "It is recommended to add a note clarifying the pioneering and unique nature of each achievement"
