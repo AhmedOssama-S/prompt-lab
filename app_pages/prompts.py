@@ -62,6 +62,57 @@ def _file_hint(name: str) -> str:
     return ""
 
 
+# What each {placeholder} actually is and where its value comes from -- see
+# runner/prompt_loader.py's render_*() calls and runner/input_adapters.py's
+# adapt_*() functions for the source of truth this is transcribed from.
+_PLACEHOLDER_DESCRIPTIONS = {
+    # Record Evaluator
+    "input_content": "The candidate's nomination content being evaluated — the request's `content` field, stringified as Python's plain `str()` of the dict (not pretty JSON — matches production exactly).",
+    "rubric_data": "The rubric criteria for the 80–100% excellence band — the request's `rubric_data` field, stringified the same plain way as `input_content`.",
+
+    # Report Evaluator — pillar evaluation
+    "pillar_name": "The pillar being evaluated (e.g. الأداء المؤسسي) — decides which sub-dimensions apply and whether the Learning & Development block gets appended.",
+    "total_weight": "This pillar's total weight as a percentage — the sum of its sub-dimensions' weights, so the model knows how much it counts toward the overall score.",
+    "subdimensions_text": "This pillar's sub-dimensions and their performance-level descriptions, formatted into a numbered list — built from the request's `rubric_data.criteria`.",
+    "summary_text": "The candidate's report text being scored against this pillar's rubric.",  # overridden below for executive_summary/*
+    "criteria_list": "The names of every pillar included in this evaluation, joined into one list (an Arabic comma vs. a plain comma, depending on language).",
+
+    # Attempt Comparator
+    "rubric_description": 'A short description of the rubric criteria used for comparison, prefixed "RUBRIC: ".',
+    "rubric_type_context": 'An optional " (Type: ...)" suffix, present only when the rubric specifies a type.',
+    "achievements_text": "The achievements being compared, serialized as JSON — referred to by generated title if title generation succeeded, or sent as-is (whatever fields the caller included) if it didn't.",
+    "terminology_rule": 'One of two wording rules, chosen automatically depending on whether achievement titles were generated: refer to each achievement by its real title, or by "Input 1" / "Input 2" etc. if titles aren\'t available.',
+    "all_content": 'Every achievement\'s content, flattened into "key: value" lines and labeled "Achievement N" — this is what the title-generation call reads to produce short titles.',
+
+    # Pillar Summarizer
+    "data_text": 'The pillar\'s input rows (achievements), formatted into readable "key: value" lines grouped per row — the raw material the summary is written from.',
+    "min_words": "The acceptable range's floor — target word count minus 100.",
+    "max_words": "The acceptable range's ceiling — the target word count itself; the summary must never exceed this.",
+    "target_minus_50": "Target word count minus 50 — used as a safer aim-for number in some reminders, so the model doesn't hover right at the ceiling.",
+    "current_word_count": "The previous attempt's actual word count — tells the model how far off target the last try was.",
+    "word_diff_abs": "The absolute difference between the target word count and the previous attempt's word count.",
+    "previous_summary": "The previous attempt's full summary text — this retry expands or condenses it rather than starting over.",
+    "over": "How many words over the maximum the previous attempt was — picks which of the three escalating cut instructions gets used.",
+    "operation": "The specific tiered edit instruction for this retry (from `final_retry_operations.json`) — tells the model exactly how aggressively to cut or expand, scaled to how far off the previous attempt was.",
+}
+
+# A handful of names mean something different in one specific file than
+# everywhere else they appear -- keyed by the same prefix-matching _file_hint()
+# already uses, so a new file only needs an entry here if it collides.
+_PLACEHOLDER_OVERRIDES = {
+    "executive_summary/": {
+        "summary_text": "The combined report text across all pillars supplied (or the one pillar's text, if only one was given) — this is what the executive summary synthesizes.",
+    },
+}
+
+
+def _placeholder_description(file_name: str, name: str) -> str:
+    for prefix, overrides in _PLACEHOLDER_OVERRIDES.items():
+        if file_name.startswith(prefix) and name in overrides:
+            return overrides[name]
+    return _PLACEHOLDER_DESCRIPTIONS.get(name, "(no description recorded for this placeholder yet)")
+
+
 def _describe(use_case: str, version: str, file_name: str) -> str:
     uc = _USE_CASE_LABELS.get(use_case, use_case)
     if version == "shared":
@@ -104,9 +155,9 @@ with tab_new:
     baseline = store.read_stored_prompt(use_case, version, file_name)
     ph = sorted(store.placeholders(baseline))
     if ph:
-        st.caption(
-            ":material/data_object: Placeholders filled in automatically at run time — keep them exactly as they are: "
-            + " ".join(f"`{{{p}}}`" for p in ph)
+        st.caption(":material/data_object: Placeholders filled in automatically at run time — keep them exactly as they are:")
+        st.markdown(
+            "\n".join(f"- `{{{p}}}` — {_placeholder_description(file_name, p)}" for p in ph)
         )
 
     # Reset the editor when the target file changes, otherwise the textarea keeps
