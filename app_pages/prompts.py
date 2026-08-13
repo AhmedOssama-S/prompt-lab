@@ -247,16 +247,18 @@ with tab_existing:
     if not shown:
         st.caption("Nothing with that status.")
 
-    _STATUS_ICON = {
-        store.STATUS_DRAFT: ":material/edit:",
-        store.STATUS_APPROVED: ":material/verified:",
-        store.STATUS_REJECTED: ":material/cancel:",
-        store.STATUS_APPLIED: ":material/task_alt:",
+    # Approved is the "pending on someone else" state (waiting for a developer
+    # to apply it), same semantics as a badge's usual orange/pending color.
+    _STATUS_BADGE = {
+        store.STATUS_DRAFT: ":gray-badge[:material/edit: Draft]",
+        store.STATUS_APPROVED: ":orange-badge[:material/verified: Approved]",
+        store.STATUS_REJECTED: ":red-badge[:material/cancel: Rejected]",
+        store.STATUS_APPLIED: ":green-badge[:material/task_alt: Applied]",
     }
 
     for d in shown:
         tested = bool((d.test_evidence or {}).get("tested_at"))
-        header = f"{_STATUS_ICON.get(d.status, '')} **{d.title}** — {_describe(d.use_case, d.version, d.file_name)}"
+        header = f"{_STATUS_BADGE.get(d.status, '')} **{d.title}** — {_describe(d.use_case, d.version, d.file_name)}"
         with st.expander(header, expanded=False):
             st.caption(
                 f"{store.STATUS_LABELS.get(d.status, d.status)} · by {d.author} · updated {d.updated_at[:16].replace('T', ' ')} UTC"

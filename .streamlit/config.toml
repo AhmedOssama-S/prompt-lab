@@ -1,6 +1,66 @@
 # Committed. Never put secrets here -- use .streamlit/secrets.toml (gitignored)
 # or the host's secrets UI.
 
+[theme]
+# Corporate brand theme: light main content (a shade of white, not stark
+# #FFFFFF, with near-black body text per the brand's "black text on light
+# sections" rule) plus a deep navy/indigo sidebar that carries the brand's
+# dark hero-section identity instead of the main content. Locked to a single
+# light mode (no [theme.dark]) since this is a specific brand identity, not a
+# preference the user should be able to toggle away from.
+base = "light"
+
+# The vivid end of the brand's button gradient (no native gradient support in
+# config.toml, so it's used as one flat primary color rather than faked with
+# CSS) -- dark enough to still contrast cleanly with white button text even
+# against a light page.
+primaryColor = "#5919C1"
+backgroundColor = "#FAF9FD"          # a shade of white, not stark #FFFFFF
+secondaryBackgroundColor = "#EFECF7" # slightly deeper tint, for widget/code backgrounds
+borderColor = "#E1DCF0"
+
+textColor = "#15121F"                # near-black, per "black text on light sections"
+linkColor = "#E0359D"                # magenta/pink secondary accent
+linkUnderline = false
+
+codeBackgroundColor = "#F2EFF9"
+codeTextColor = "#15121F"
+
+violetColor = "#7C3AED"
+orangeColor = "#B5764A"              # warm brown, for badges/status chips
+redColor = "#DC2626"
+greenColor = "#16A34A"
+yellowColor = "#D97706"
+blueColor = "#2563EB"
+grayColor = "#6B7280"
+
+chartCategoricalColors = ["#5919C1", "#E0359D", "#B5764A", "#2563EB", "#16A34A", "#D97706", "#6B7280"]
+
+dataframeBorderColor = "#E1DCF0"
+dataframeHeaderBackgroundColor = "#EFECF7"
+
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+headingFont = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap"
+baseFontSize = 15
+
+baseRadius = "10px"
+buttonRadius = "10px"
+showWidgetBorder = true
+showSidebarBorder = true
+
+[theme.sidebar]
+# Deep navy/indigo, exactly the brand's dark hero-section identity -- kept
+# here rather than diluted across the whole (now light) app, so the nav rail
+# reads as a deliberate, distinct anchor instead of a plain gray strip.
+# Active nav item uses the magenta/pink secondary accent, distinct from the
+# violet primaryColor driving buttons in the light main content -- "magenta
+# marks where you are", "violet marks what you can do".
+backgroundColor = "#0A0A2E"
+secondaryBackgroundColor = "#1A1050"  # hover/active row background
+textColor = "#F1EEFB"
+borderColor = "#3B1181"
+primaryColor = "#E0359D"
+
 [browser]
 # This app handles government award nomination content. Don't send usage
 # telemetry off-box.
