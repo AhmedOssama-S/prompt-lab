@@ -18,7 +18,7 @@ if judge verdicts start looking position-biased in practice.
 
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import yaml
 
@@ -71,7 +71,7 @@ OUTPUT B:
 Return ONLY a valid JSON object with this exact structure:
 {{
   "criterion_scores": [
-    {{"criterion": "<criterion name, exactly as given above>", "score_a": <integer 1-10>, "score_b": <integer 1-10>, "notes": "<1-2 sentence comparison for this specific criterion>"}}
+    {{"criterion": "<criterion name, exactly as given above>", "score_a": <integer 1-10>, "score_b": <integer 1-10>, "notes": "<1-2 sentence comparison for this specific criterion>", "quote_a": <string or null>, "quote_b": <string or null>}}
   ],
   "overall_score_a": <number 0-100>,
   "overall_score_b": <number 0-100>,
@@ -80,7 +80,25 @@ Return ONLY a valid JSON object with this exact structure:
 }}
 
 Score strictly and specifically -- ground every score in the criterion's actual description and in concrete details from each output, not a generic impression. If both outputs are equally good on a criterion, give them equal scores. Do not let output length alone influence scores. Include one criterion_scores entry per criterion listed above, in the same order.
+
+For quote_a and quote_b: when a side's score reflects a specific problem (or a specific strength worth pointing to), copy the exact sentence or clause from THAT SIDE'S OWN output that shows it -- character-for-character, not paraphrased, not translated, not summarized, not shortened with "...". This must be text a reader can find with Ctrl+F in the raw output. Keep it short (one sentence or clause, not a whole paragraph). Use null when a side's score doesn't hinge on one identifiable spot (e.g. a plain 9/10 with nothing specific to flag) -- do not invent a quote just to fill the field.
 """
+
+
+def quote_found_in_output(quote: Optional[str], output: dict) -> Optional[bool]:
+    """True/False if `quote` can/can't be located verbatim in `output`, None if there's no quote to check.
+
+    The judge is instructed to copy quotes character-for-character, but an
+    LLM asked to quote itself can still paraphrase or invent one -- this is
+    what actually verifies that, rather than just trusting the claim. Checked
+    against the same JSON serialization the judge was shown (see
+    build_judge_prompt), so a quote spanning a field's literal value matches
+    the same text the model was reading.
+    """
+    if not quote or not quote.strip():
+        return None
+    haystack = json.dumps(output, ensure_ascii=False)
+    return quote.strip() in haystack
 
 
 def run_judge(use_case: str, context: str, output_a: dict, output_b: dict, clients: Dict[str, Any]) -> tuple[JudgeVerdict, str]:

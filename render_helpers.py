@@ -3,6 +3,7 @@
 import pandas as pd
 import streamlit as st
 
+from runner.judge import quote_found_in_output
 from runner.judge_models import JudgeVerdict
 from runner.models import (
     ComparisonResponse,
@@ -200,7 +201,7 @@ def render_attempt_trajectory(result: PillarSummaryResult) -> None:
             st.code(a.raw_text, language="json")
 
 
-def render_judge_verdict(verdict: JudgeVerdict, model_key: str) -> None:
+def render_judge_verdict(verdict: JudgeVerdict, model_key: str, output_a: dict, output_b: dict) -> None:
     st.subheader(":material/gavel: Auto-judge verdict")
     st.caption(f"Judged by {model_key} against this use case's own rule checklist (see prompts/*/judge_criteria.yaml)")
 
@@ -219,3 +220,26 @@ def render_judge_verdict(verdict: JudgeVerdict, model_key: str) -> None:
             for cs in verdict.criterion_scores
         ])
         st.dataframe(df, width="stretch", hide_index=True)
+
+        cited = [cs for cs in verdict.criterion_scores if cs.quote_a or cs.quote_b]
+        if cited:
+            st.markdown("**Cited lines**")
+            st.caption(
+                "The exact excerpt each score is pointing to, checked against that side's actual output -- "
+                "not just the judge's word for it."
+            )
+            for cs in cited:
+                with st.container(border=True):
+                    st.markdown(f"**{cs.criterion}** — A: {cs.score_a}/10 · B: {cs.score_b}/10")
+                    for side_label, quote, output in (("A", cs.quote_a, output_a), ("B", cs.quote_b, output_b)):
+                        if not quote:
+                            continue
+                        verified = quote_found_in_output(quote, output)
+                        if verified:
+                            st.caption(f":material/check_circle: Side {side_label} — found verbatim in the output")
+                        else:
+                            st.caption(
+                                f":material/help: Side {side_label} — couldn't locate this verbatim in the output "
+                                "(the judge may have paraphrased or translated it)"
+                            )
+                        st.code(quote, language="text")

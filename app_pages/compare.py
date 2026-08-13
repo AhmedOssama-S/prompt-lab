@@ -573,6 +573,7 @@ if run_clicked:
     st.session_state["judge_verdict"] = None
     st.session_state["judge_error"] = None
     st.session_state["judge_model_used"] = None
+    st.session_state["judge_outputs"] = None
 
     both_ok = all(r["kind"] != "error" for r in st.session_state["side_results"].values())
     if both_ok and _judge_supported(use_case, prompt_part):
@@ -607,6 +608,10 @@ if run_clicked:
             verdict, judge_model = run_judge(use_case, context, output_a, output_b, clients)
             st.session_state["judge_verdict"] = verdict
             st.session_state["judge_model_used"] = judge_model
+            # Kept alongside the verdict (not just a local variable) because
+            # render_judge_verdict() needs them to verify quote_a/quote_b on
+            # every rerun of this page, not just the run that computed them.
+            st.session_state["judge_outputs"] = {"A": output_a, "B": output_b}
 
             # Attach the verdict to any draft that was on either side, so the
             # Prompts page can require evidence before approval and the Handoff
@@ -676,7 +681,10 @@ if st.session_state.get("side_results"):
     if both_succeeded and _judge_supported(st.session_state["last_use_case"], st.session_state["last_prompt_part"]):
         st.divider()
         if st.session_state.get("judge_verdict"):
-            render_judge_verdict(st.session_state["judge_verdict"], st.session_state["judge_model_used"])
+            render_judge_verdict(
+                st.session_state["judge_verdict"], st.session_state["judge_model_used"],
+                st.session_state["judge_outputs"]["A"], st.session_state["judge_outputs"]["B"],
+            )
         elif st.session_state.get("judge_error"):
             st.warning(st.session_state["judge_error"], icon=":material/warning:")
 
