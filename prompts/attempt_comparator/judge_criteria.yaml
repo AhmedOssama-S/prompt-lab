@@ -62,6 +62,62 @@ record_id_validity:
     actually presented in the input (by id or by matching title), rather
     than an invented or mismatched identifier?
 
+# --- Business acceptance-criteria additions (Medals_AI_UC1_UC2_Business_
+# Acceptance_Criteria.html, Aug 2026). Marked per criterion whether it
+# checks a rule ALREADY in main_prompt.txt with no judge coverage yet, or
+# (NOTE) a forward-looking business bar not yet written into the prompt.
+
+all_inputs_individually_analyzed:
+  description: >
+    Does individual_analysis cover EVERY achievement in the input array
+    with its own concrete-anchored point, none skipped, before the
+    comparative analysis begins? Already explicit in the prompt ("You MUST
+    analyze and compare ALL of them individually, then collectively").
+
+dimension_based_comparison:
+  description: >
+    Does comparative_analysis visibly weigh the inputs on the prompt's own
+    defined dimensions (clarity, evidence quality, impact depth,
+    distinctiveness/pioneering, sustainability, implementation maturity,
+    rubric alignment), and prefer figures paired with an effect
+    (before/after, %, rate) over bare counts? Already explicit in the
+    prompt's EVALUATION INSTRUCTIONS -- this checks compliance, not whether
+    the instruction exists.
+
+winner_ranking_consistency:
+  description: >
+    Is the returned record_id consistent with final_ranking's #1 entry --
+    does the declared machine-readable winner actually match the narrative
+    ranking's top pick? A mismatch here is a hard defect regardless of how
+    good the prose is: the platform acts on record_id downstream, so a
+    value that disagrees with the ranking is worse than either being wrong
+    alone.
+
+best_practices_grounded:
+  description: >
+    Are best_practices genuinely grounded in the actual strengths identified
+    for this comparison, rather than generic, could-apply-to-any-comparison
+    advice? Already explicit in the prompt's own JSON template
+    ("Recommendations grounded in the actual strengths").
+
+bilingual_json_contract:
+  description: >
+    Is the output pure JSON only (opens and closes with braces, no markdown
+    or explanatory text outside it), with parallel arabic_analysis /
+    english_analysis blocks each containing individual_analysis,
+    comparative_analysis, final_ranking, and best_practices, using \n\n
+    paragraph separation within the long-text fields? Does the Arabic use
+    verb-first sentence structure (الجملة الفعلية) as the prompt instructs?
+
+no_cross_candidate_contamination:
+  description: >
+    NOTE: main_prompt.txt has no client_name or entity-scoping concept at
+    all currently -- a forward-looking business bar (G10), not yet a real
+    prompt instruction for this use case, so a gap here reflects the
+    prompt's current state, not a model failure. Are all inputs attributed
+    only to the one assigned candidate, with no data or terminology mixed
+    in from another candidate or organization?
+
 overall_quality:
   description: >
     Holistic judgment: which output would a human government-excellence

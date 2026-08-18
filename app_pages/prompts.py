@@ -7,6 +7,8 @@ people who know what a good nomination summary reads like are not the people
 who should be editing a live deployment.
 """
 
+import re
+
 import streamlit as st
 
 from drafts import store
@@ -113,6 +115,38 @@ def _placeholder_description(file_name: str, name: str) -> str:
     return _PLACEHOLDER_DESCRIPTIONS.get(name, "(no description recorded for this placeholder yet)")
 
 
+_VERSION_FILENAME_RE = re.compile(r"^v(\d+)\.txt$")
+
+
+def _version_only_labels(tree: dict, use_case: str):
+    """Detects a use case whose whole prompt is one file per version, stored
+    flat with no version subfolder (Record Evaluator: v1.txt / v2.txt --
+    both byte-identical to production, per README, so there was never a
+    reason to split them into v1/ and v2/ subfolders).
+
+    editable_prompt_files() has no way to tell that shape apart from a real
+    "no version split, several distinct parts" case (Attempt Comparator's
+    main_prompt.txt / title_generator.txt / etc.) -- both land under the same
+    "shared" bucket. Left alone, the UI ends up backwards for Record
+    Evaluator: "Version" is stuck on the meaningless "shared" (no real
+    choice), while "Which prompt?" is the control that actually picks the
+    version (v1.txt vs v2.txt), mislabeled as if it were choosing between
+    several different parts -- there's only ever one.
+
+    Returns ["v1", "v2"] when this shape is detected, else None. Callers
+    translate a picked label back to the real (version="shared",
+    file_name=f"{label}.txt") pair before calling any store.* function --
+    this is presentation-only; the storage/override layer never changes.
+    """
+    versions = tree[use_case]
+    if list(versions.keys()) != ["shared"]:
+        return None
+    files = versions["shared"]
+    if len(files) < 2 or not all(_VERSION_FILENAME_RE.match(f) for f in files):
+        return None
+    return [f[:-4] for f in files]
+
+
 def _describe(use_case: str, version: str, file_name: str) -> str:
     uc = _USE_CASE_LABELS.get(use_case, use_case)
     if version == "shared":
@@ -120,7 +154,95 @@ def _describe(use_case: str, version: str, file_name: str) -> str:
     return f"{uc} · {version} · {file_name}"
 
 
-tab_new, tab_existing = st.tabs(["Write a new version", "Proposals"])
+# Approved is the "pending on someone else" state (waiting for a developer to
+# apply it), same semantics as a badge's usual orange/pending color. Shared
+# between the Proposals and Library tabs.
+_STATUS_BADGE = {
+    store.STATUS_DRAFT: ":gray-badge[:material/edit: Draft]",
+    store.STATUS_APPROVED: ":orange-badge[:material/verified: Approved]",
+    store.STATUS_REJECTED: ":red-badge[:material/cancel: Rejected]",
+    store.STATUS_APPLIED: ":green-badge[:material/task_alt: Applied]",
+}
+
+
+tab_library, tab_new, tab_existing = st.tabs(["Prompt library", "Write a new version", "Proposals"])
+
+
+# ================================================================ library
+
+with tab_library:
+    st.caption(
+        "What's actually in use today, and any of your own changes that have been approved "
+        "or already applied to it."
+    )
+    tree = store.editable_prompt_files()
+
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        uc_label = st.selectbox(
+            "Which part of the system?",
+            [_USE_CASE_LABELS.get(k, k) for k in tree],
+            key="lib_uc",
+        )
+        lib_use_case = next(k for k in tree if _USE_CASE_LABELS.get(k, k) == uc_label)
+
+    lib_version_only = _version_only_labels(tree, lib_use_case)
+    with c2:
+        if lib_version_only:
+            lib_picked_version = st.selectbox(
+                "Version",
+                lib_version_only,
+                index=len(lib_version_only) - 1,  # newest version is the sensible default
+                key="lib_version",
+            )
+        else:
+            lib_versions = list(tree[lib_use_case])
+            lib_version = st.selectbox(
+                "Version",
+                lib_versions,
+                index=len(lib_versions) - 1,  # newest version is the sensible default
+                key="lib_version",
+            )
+    with c3:
+        if lib_version_only:
+            lib_version, lib_file = "shared", f"{lib_picked_version}.txt"
+            st.caption(f":material/check_circle: {_USE_CASE_LABELS.get(lib_use_case, lib_use_case)}'s whole prompt is one file per version — nothing else to pick.")
+        else:
+            lib_file = st.selectbox("Which prompt?", tree[lib_use_case][lib_version], key="lib_file")
+
+    hint = _file_hint(lib_file)
+    if hint:
+        st.caption(f":material/info: {hint}")
+
+    current_text = store.read_stored_prompt(lib_use_case, lib_version, lib_file)
+    ph = sorted(store.placeholders(current_text))
+    if ph:
+        st.caption(":material/data_object: Placeholders filled in automatically at run time:")
+        st.markdown(
+            "\n".join(f"- `{{{p}}}` — {_placeholder_description(lib_file, p)}" for p in ph)
+        )
+
+    st.markdown(f"**Current text** — this is what every run actually uses today for `{_describe(lib_use_case, lib_version, lib_file)}`")
+    st.code(current_text, language="text")
+
+    related = [
+        d for d in store.load_all()
+        if d.use_case == lib_use_case and d.version == lib_version and d.file_name == lib_file
+        and d.status in (store.STATUS_APPROVED, store.STATUS_APPLIED)
+    ]
+    st.markdown("**Your approved changes to this file**")
+    if not related:
+        st.caption("None yet — approved and applied proposals for this exact file will show up here.")
+    for d in related:
+        with st.expander(f"{_STATUS_BADGE.get(d.status, '')} **{d.title}**", expanded=False):
+            st.caption(f"by {d.author} · updated {d.updated_at[:16].replace('T', ' ')} UTC")
+            if d.rationale:
+                st.markdown(f"**Goal:** {d.rationale}")
+            st.markdown("**Full text**")
+            st.code(d.text(), language="text")
+            diff = d.diff()
+            st.markdown("**Diff vs. the current text above**")
+            st.code(diff or "(identical — this is now the current text)", language="diff")
 
 
 # ================================================================ new draft
@@ -136,17 +258,32 @@ with tab_new:
             key="draft_uc",
         )
         use_case = next(k for k in tree if _USE_CASE_LABELS.get(k, k) == uc_label)
+
+    version_only = _version_only_labels(tree, use_case)
     with c2:
-        versions = list(tree[use_case])
-        version = st.selectbox(
-            "Version to base it on",
-            versions,
-            index=len(versions) - 1,  # newest version is the sensible default
-            key="draft_version",
-            help="Start from the version currently in use, unless you're deliberately reviving an older one.",
-        )
+        if version_only:
+            picked_version = st.selectbox(
+                "Version to base it on",
+                version_only,
+                index=len(version_only) - 1,  # newest version is the sensible default
+                key="draft_version",
+                help="Start from the version currently in use, unless you're deliberately reviving an older one.",
+            )
+        else:
+            versions = list(tree[use_case])
+            version = st.selectbox(
+                "Version to base it on",
+                versions,
+                index=len(versions) - 1,  # newest version is the sensible default
+                key="draft_version",
+                help="Start from the version currently in use, unless you're deliberately reviving an older one.",
+            )
     with c3:
-        file_name = st.selectbox("Which prompt?", tree[use_case][version], key="draft_file")
+        if version_only:
+            version, file_name = "shared", f"{picked_version}.txt"
+            st.caption(f":material/check_circle: {_USE_CASE_LABELS.get(use_case, use_case)}'s whole prompt is one file per version — nothing else to pick.")
+        else:
+            file_name = st.selectbox("Which prompt?", tree[use_case][version], key="draft_file")
 
     hint = _file_hint(file_name)
     if hint:
@@ -246,15 +383,6 @@ with tab_existing:
     shown = all_drafts if status_filter == "All" else [d for d in all_drafts if d.status == status_filter.lower()]
     if not shown:
         st.caption("Nothing with that status.")
-
-    # Approved is the "pending on someone else" state (waiting for a developer
-    # to apply it), same semantics as a badge's usual orange/pending color.
-    _STATUS_BADGE = {
-        store.STATUS_DRAFT: ":gray-badge[:material/edit: Draft]",
-        store.STATUS_APPROVED: ":orange-badge[:material/verified: Approved]",
-        store.STATUS_REJECTED: ":red-badge[:material/cancel: Rejected]",
-        store.STATUS_APPLIED: ":green-badge[:material/task_alt: Applied]",
-    }
 
     for d in shown:
         tested = bool((d.test_evidence or {}).get("tested_at"))

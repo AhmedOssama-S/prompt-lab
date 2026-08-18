@@ -77,6 +77,61 @@ json_validity:
     english_analysis, each with strengths, areas_for_improvement, and
     recommendations arrays?
 
+# --- Business acceptance-criteria additions (Medals_AI_UC1_UC2_Business_
+# Acceptance_Criteria.html, Aug 2026). Two different kinds of gap, marked
+# per criterion: some check a rule ALREADY in v1.txt/v2.txt that simply had
+# no judge coverage yet; others (marked NOTE) are a forward-looking business
+# bar not yet written into either version's stored prompt -- score both
+# sides anyway, since a gap there is a real finding, not a false failure.
+
+full_rubric_coverage:
+  description: >
+    Does the output assess ALL aspects/dimensions of the excellence
+    (80-100%) rubric comprehensively, with none skipped, and analyze only
+    fields actually present in the request? Already explicit in the prompt
+    ("Assess ALL aspects mentioned in the rubric comprehensively; do not
+    skip any criteria or dimension") -- this checks whether the model
+    actually complied, not whether the instruction exists.
+
+formal_verb_usage:
+  description: >
+    Do strength points use formal government verbs (بادر، أسهم، حقق، قاد،
+    رسّخ, or English equivalents like "initiated," "led," "established"),
+    rather than casual phrasing? Already explicit in the prompt (rule 7
+    under strengths formatting).
+
+no_multi_phase_date_suggestion:
+  description: >
+    Does the output avoid suggesting a date be split into multiple phases or
+    entries? The system allows only one date entry per field -- already
+    explicit in the prompt's mandatory requirements.
+
+improvement_specificity:
+  description: >
+    Is each improvement point specific to THIS record's actual content --
+    naming a real, concretely absent detail (e.g. "does not document the
+    number of procedures since the unit's establishment in 2023") -- rather
+    than a generic template phrase like "lacks quantitative indicators" that
+    could apply to any record?
+
+performance_dimension_linking:
+  description: >
+    NOTE: not currently instructed anywhere in record_evaluator's stored
+    v1/v2 prompt -- a forward-looking bar from the business acceptance doc,
+    not a real prompt requirement yet, so don't be surprised if both sides
+    fall short. Are strengths explicitly linked to the performance
+    dimensions (الأداء / المساهمات / النمو / الانفتاح) where relevant to
+    that point?
+
+client_only_attribution:
+  description: >
+    NOTE: v1/v2's stored prompt has no client_name or entity-scoping concept
+    at all currently -- this is a forward-looking business bar (G10), not
+    yet a real prompt instruction, so a gap here reflects the prompt's
+    current state, not a model failure. Is the candidate/entity named only
+    as the one assigned client, with no other organization or another
+    candidate's data mixed in?
+
 overall_quality:
   description: >
     Holistic judgment: which output would a human government-excellence

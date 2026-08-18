@@ -456,11 +456,31 @@ for label, col in (("A", col_a), ("B", col_b)):
         elif combo_note:
             st.caption(f":material/info: {combo_note}")
 
-run_clicked = st.button("Run comparison", type="primary", icon=":material/play_arrow:", width="stretch", disabled=payload is None)
+# A plain st.button stays rendered exactly as clicked for the whole run --
+# both side calls plus the judge can take well over a minute combined, and a
+# button that still reads "Run comparison" the entire time looks stale/dead,
+# not busy. Swapping it for a disabled, clearly-in-progress button in the
+# same slot (via st.empty()) fixes that without touching anything below --
+# Streamlit streams this update to the page before the slow work starts,
+# since script execution renders top to bottom as it goes.
+# Explicit, distinct keys on all three calls below: the idle-before and
+# idle-after buttons are otherwise identical calls (same label, same other
+# args), and Streamlit's auto-generated element ID is derived from those
+# args alone -- without keys, the second identical call raises
+# StreamlitDuplicateElementId and aborts the whole script.
+run_button_slot = st.empty()
+run_clicked = run_button_slot.button(
+    "Run comparison", type="primary", icon=":material/play_arrow:", width="stretch",
+    disabled=payload is None, key="run_comparison_idle",
+)
 
 # ---------- Run ----------
 
 if run_clicked:
+    run_button_slot.button(
+        "Running comparison…", icon=":material/progress_activity:", type="primary", width="stretch", disabled=True,
+        key="run_comparison_running",
+    )
     st.session_state["last_use_case"] = use_case
     st.session_state["last_prompt_part"] = prompt_part
     st.session_state["last_payload"] = payload
@@ -638,6 +658,15 @@ if run_clicked:
             st.session_state["judge_error"] = str(e)
         except Exception as e:  # noqa: BLE001 -- judge failure shouldn't hide the two side results that did succeed
             st.session_state["judge_error"] = f"Auto-judge failed: {e}"
+
+    # Both sides and the judge are done -- restore the normal, clickable
+    # button now, in this same run, rather than leaving "Running comparison…"
+    # showing (disabled) until some unrelated later interaction happens to
+    # rerun the script. Results render below from session_state either way.
+    run_button_slot.button(
+        "Run comparison", type="primary", icon=":material/play_arrow:", width="stretch",
+        disabled=payload is None, key="run_comparison_done",
+    )
 
 # ---------- Results ----------
 
