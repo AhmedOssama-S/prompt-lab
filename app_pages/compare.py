@@ -436,6 +436,10 @@ st.divider()
 # fragments, same retry loop, same call parameters. That is the point: a draft
 # has to be judged on what it would actually do in production.
 _drafts_for_use_case = [d for d in draft_store.load_all() if d.use_case == use_case]
+# load_all() returns [] rather than raising when the drafts backend is down, so
+# without this the page would silently look like it simply has no proposals.
+if draft_store.backend_error():
+    st.warning(draft_store.backend_error(), icon=":material/cloud_off:")
 _draft_by_label = {f"Draft: {d.title}": d for d in _drafts_for_use_case}
 
 col_a, col_b = st.columns(2)

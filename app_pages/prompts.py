@@ -23,6 +23,7 @@ if store.storage_is_ephemeral():
     st.error(store.EPHEMERAL_WARNING, icon=":material/warning:")
 
 
+
 def _author() -> str:
     """Remembered across pages so nobody retypes it every save."""
     return st.session_state.get("author_name", "")
@@ -373,6 +374,10 @@ with tab_new:
 
 with tab_existing:
     all_drafts = store.load_all()
+    # load_all() returns [] rather than raising when the drafts backend is down,
+    # so without this an unreachable Supabase looks identical to "nothing here yet".
+    if store.backend_error():
+        st.warning(store.backend_error(), icon=":material/cloud_off:")
     if not all_drafts:
         st.info("No proposals yet. Write one in the first tab.", icon=":material/info:")
         st.stop()

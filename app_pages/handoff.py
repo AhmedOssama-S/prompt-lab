@@ -23,6 +23,7 @@ st.caption(
 if store.storage_is_ephemeral():
     st.error(store.EPHEMERAL_WARNING, icon=":material/warning:")
 
+
 # Where each use case's prompts live in the real repo. Attempt Comparator's text
 # is byte-identical across generations, and Pillar Summarizer/Report Evaluator
 # keep v1 and v2 in different function folders -- so the mapping isn't uniform.
@@ -67,6 +68,11 @@ def _builder_hint(file_name: str) -> str:
 
 approved = [d for d in store.load_all() if d.status == store.STATUS_APPROVED]
 applied = [d for d in store.load_all() if d.status == store.STATUS_APPLIED]
+
+# load_all() returns [] rather than raising when the drafts backend is down,
+# so without this an unreachable Supabase looks identical to "nothing here yet".
+if store.backend_error():
+    st.warning(store.backend_error(), icon=":material/cloud_off:")
 
 if not approved:
     st.success("Nothing waiting. No approved proposals to apply.", icon=":material/check_circle:")

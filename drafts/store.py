@@ -37,8 +37,49 @@ PROMPTS_DIR = DRAFTS_DIR.parent / "prompts"
 def _use_supabase() -> bool:
     """True when drafts should be read/written through Supabase instead of
     local files -- set SUPABASE_URL and SUPABASE_KEY (a service_role key,
-    not anon) to enable. See supabase_backend.py and schema.sql."""
+    not anon) to enable. See supabase_backend.py and schema.sql.
+
+    Note this says "configured", not "reachable" -- it is a check on the two
+    env vars, nothing more. Reachability is handled at the call sites below,
+    because a configured-but-dead backend must not take the whole app down.
+    """
     return supabase_backend.is_configured()
+
+
+class DraftBackendUnavailable(RuntimeError):
+    """Supabase is configured but the request to it failed.
+
+    Raised only from the WRITE paths. Reads degrade quietly to an empty list
+    (see _read_backend_error) because a page that cannot list drafts is still
+    a usable page; a write that silently did nothing is a lost draft, so that
+    one has to be loud.
+    """
+
+
+_read_backend_error: Optional[str] = None
+
+
+def backend_error() -> Optional[str]:
+    """One-line description of the last failed Supabase READ, or None.
+
+    Pages call this after load_all() to tell "no drafts yet" apart from "the
+    drafts are there but the backend is unreachable" -- without it the two are
+    indistinguishable, and a deployment whose Supabase project has gone away
+    looks like a working app that has simply lost everything. Returns the
+    message rather than raising, so rendering can continue.
+    """
+    return _read_backend_error
+
+
+def _note_read_failure(exc: Exception) -> None:
+    global _read_backend_error
+    url = os.environ.get("SUPABASE_URL", "")
+    _read_backend_error = (
+        f"Draft storage is unreachable, so no proposals can be listed. Supabase is configured "
+        f"({url or 'SUPABASE_URL unset'}) but the request failed: {type(exc).__name__}. "
+        f"If that project no longer exists, clear SUPABASE_URL and SUPABASE_KEY to fall back "
+        f"to local-file drafts -- see DEPLOY.md, 'Making drafts survive'."
+    )
 
 STATUS_DRAFT = "draft"
 STATUS_APPROVED = "approved"
@@ -358,14 +399,22 @@ def _write(draft: Draft, draft_text: Optional[str]) -> None:
         # already there. Only a stale/hand-built Draft would need the fetch.
         text = draft_text if draft_text is not None else getattr(draft, "draft_text", None)
         if text is None:
-            existing = supabase_backend.load(draft.draft_id)
+            try:
+                existing = supabase_backend.load(draft.draft_id)
+            except Exception as e:
+                raise DraftBackendUnavailable(f"Could not reach Supabase to save draft {draft.draft_id!r}: {e}") from e
             if existing is None:
                 raise ValueError(f"No existing row for draft {draft.draft_id!r} to carry draft_text forward from")
             text = existing["draft_text"]
         draft.draft_text = text
         row = asdict(draft)
         row["draft_text"] = text
-        supabase_backend.save(row)
+        # Deliberately NOT degraded the way the reads above are: a save that
+        # quietly did nothing is a lost draft, so this has to surface.
+        try:
+            supabase_backend.save(row)
+        except Exception as e:
+            raise DraftBackendUnavailable(f"Draft {draft.draft_id!r} was NOT saved -- Supabase is unreachable: {e}") from e
         return
 
     d = DRAFTS_DIR / draft.draft_id
@@ -387,7 +436,10 @@ def _from_row(row: Dict[str, Any]) -> Draft:
 
 def load(draft_id: str) -> Draft:
     if _use_supabase():
-        row = supabase_backend.load(draft_id)
+        try:
+            row = supabase_backend.load(draft_id)
+        except Exception as e:
+            raise DraftBackendUnavailable(f"Could not read draft {draft_id!r} from Supabase: {e}") from e
         if row is None:
             raise FileNotFoundError(f"No draft {draft_id!r} in Supabase")
         return _from_row(row)
@@ -398,7 +450,16 @@ def load(draft_id: str) -> Draft:
 def load_all() -> List[Draft]:
     if _use_supabase():
         out = []
-        for row in supabase_backend.load_all():
+        try:
+            rows = supabase_backend.load_all()
+        except Exception as e:
+            # Every page calls this at import time, so letting a transport
+            # error out of here takes down the entire app -- which is what a
+            # deleted Supabase project used to do. Degrade to "no drafts" and
+            # leave the reason retrievable via backend_error().
+            _note_read_failure(e)
+            return []
+        for row in rows:
             try:
                 out.append(_from_row(row))
             except TypeError:
@@ -416,7 +477,10 @@ def load_all() -> List[Draft]:
 
 def delete(draft_id: str) -> None:
     if _use_supabase():
-        supabase_backend.delete(draft_id)
+        try:
+            supabase_backend.delete(draft_id)
+        except Exception as e:
+            raise DraftBackendUnavailable(f"Draft {draft_id!r} was NOT deleted -- Supabase is unreachable: {e}") from e
         return
     d = DRAFTS_DIR / draft_id
     for f in ("draft.txt", "meta.json"):
