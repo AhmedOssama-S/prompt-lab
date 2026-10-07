@@ -74,11 +74,19 @@ def backend_error() -> Optional[str]:
 def _note_read_failure(exc: Exception) -> None:
     global _read_backend_error
     url = os.environ.get("SUPABASE_URL", "")
+    # Pausing is named first on purpose: a Supabase project that has been idle
+    # long enough to auto-pause has its DNS withdrawn, so it fails exactly like
+    # a deleted one -- same NXDOMAIN, same ConnectError. The paused case is both
+    # far more common and the one that fixes itself, so pointing at "resume it"
+    # before "clear the config" avoids talking someone into throwing away a
+    # working project's credentials over a temporary outage.
     _read_backend_error = (
         f"Draft storage is unreachable, so no proposals can be listed. Supabase is configured "
         f"({url or 'SUPABASE_URL unset'}) but the request failed: {type(exc).__name__}. "
-        f"If that project no longer exists, clear SUPABASE_URL and SUPABASE_KEY to fall back "
-        f"to local-file drafts -- see DEPLOY.md, 'Making drafts survive'."
+        f"Most likely the project is paused -- resume it from the Supabase dashboard and reload; "
+        f"a paused project is indistinguishable from a deleted one from here. Only if it is "
+        f"genuinely gone, clear SUPABASE_URL and SUPABASE_KEY to fall back to local-file drafts "
+        f"-- see DEPLOY.md, 'Making drafts survive'."
     )
 
 STATUS_DRAFT = "draft"
