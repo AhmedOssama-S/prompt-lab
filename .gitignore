@@ -7,3 +7,6 @@ streamlit.log
 
 # Regenerated on demand by tools/pillar_summarizer_fidelity/extract.py
 tools/pillar_summarizer_fidelity/out/
+
+# Local virtualenv (created to run the app locally)
+.venv/
