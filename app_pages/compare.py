@@ -85,8 +85,13 @@ st.caption(
 # reasons: v1's Pillar Summarizer Claude path is broken in production and can
 # never succeed (see engine.py::_call_pillar_summarizer), and v2 dropped Claude
 # from all four use cases, so nothing currently shipping uses it.
-_RECORD_EVALUATOR_MODELS = ["gemini_flash", "gemini_pro", "core42_gpt-5.1", "core42_gpt-4.1"]
-_REPORT_EVALUATOR_MODELS = ["gemini_flash", "gemini_pro", "gpt4o", "core42_gpt-5.1", "core42_gpt-4.1"]
+# core42_gpt-6 is the one entry here with no production history at all: it is
+# not in any Medals-AI deployment's model enum, in either version. It is offered
+# so a prompt can be benchmarked against it ahead of any decision to adopt it,
+# which is why every use case pairs with it under a "never paired in production"
+# note below rather than being presented as a like-for-like swap.
+_RECORD_EVALUATOR_MODELS = ["gemini_flash", "gemini_pro", "core42_gpt-5.1", "core42_gpt-4.1", "core42_gpt-6"]
+_REPORT_EVALUATOR_MODELS = ["gemini_flash", "gemini_pro", "gpt4o", "core42_gpt-5.1", "core42_gpt-4.1", "core42_gpt-6"]
 # Attempt Comparator never had a GPT-4o path in either version -- same
 # roster as Record Evaluator otherwise (prompt text is version-independent
 # here too, see schemas/SCHEMAS.md provenance note).
@@ -113,6 +118,15 @@ VALID_MODELS = {
 # provider in production, and that omission is preserved for Core42 too
 # (see runner/prompt_loader.py::load_report_evaluator_core42_system_message) --
 # so v1+Core42 gets no system message, while v2+Core42 does.
+# gpt-6-sol is the one model here that cannot be pinned to temperature 0.3 --
+# the endpoint refuses any explicit value (see runner/engine.py
+# ::CORE42_NO_TEMPERATURE). That makes it a weaker A/B baseline than the
+# other models, so every gpt-6 note below opens with it.
+_GPT6_TEMP_CAVEAT = (
+    "Samples at temperature 1: gpt-6-sol rejects the 0.3 every other model here is pinned to, "
+    "so some of any difference you see may be sampling rather than the prompt. "
+)
+
 _NON_NATIVE_COMBO_NOTES = {
     ("record_evaluator", "v1", "core42_gpt-5.1"): "Never paired in production (v1 predates Core42) -- testing v1's prompt text against this model.",
     ("record_evaluator", "v1", "core42_gpt-4.1"): "Never paired in production (v1 predates Core42) -- testing v1's prompt text against this model.",
@@ -122,6 +136,21 @@ _NON_NATIVE_COMBO_NOTES = {
     ("attempt_comparator", "v1", "core42_gpt-5.1"): "Never paired in production (v1 predates Core42) -- testing v1's prompt text against this model.",
     ("attempt_comparator", "v1", "core42_gpt-4.1"): "Never paired in production (v1 predates Core42) -- testing v1's prompt text against this model.",
     ("pillar_summarizer", "v2", "gpt4o"): "Never paired in production (v2 dropped Claude/GPT-4o) -- testing v2's prompt text against this model.",
+
+    # gpt-6 has no production pairing anywhere, so every combo it appears in is
+    # non-native -- including the v2 ones, which for the other Core42 models are
+    # the native case. Spelled out per use case rather than collapsed into a
+    # catch-all so the v1-vs-v2 caveats stay as specific as they are above.
+    # Each one leads with the temperature caveat: it is the only difference here
+    # that can change the answer to "which prompt is better", so it should not be
+    # buried behind the provenance note. See CORE42_NO_TEMPERATURE in engine.py.
+    ("record_evaluator", "v1", "core42_gpt-6"): _GPT6_TEMP_CAVEAT + "Also never paired in production (v1 predates Core42, and gpt-6 is in no deployment's model enum).",
+    ("record_evaluator", "v2", "core42_gpt-6"): _GPT6_TEMP_CAVEAT + "Also never paired in production -- gpt-6 is in no deployment's model enum. Otherwise runs v2's Core42 profile (JSON mode, 16384-token cap).",
+    ("report_evaluator", "v1", "core42_gpt-6"): _GPT6_TEMP_CAVEAT + "Also never paired in production, and v1 never gets a JSON-format system message for any non-Gemini provider -- that's preserved here, so this call gets none either (unlike v2+Core42).",
+    ("report_evaluator", "v2", "core42_gpt-6"): _GPT6_TEMP_CAVEAT + "Also never paired in production -- gpt-6 is in no deployment's model enum. Gets v2's Core42 JSON-format system message, same as the other Core42 models.",
+    ("attempt_comparator", "v1", "core42_gpt-6"): _GPT6_TEMP_CAVEAT + "Also never paired in production (v1 predates Core42, and gpt-6 is in no deployment's model enum).",
+    ("attempt_comparator", "v2", "core42_gpt-6"): _GPT6_TEMP_CAVEAT + "Also never paired in production -- gpt-6 is in no deployment's model enum. Otherwise runs v2's Core42 profile, including the prepended JSON-only system message.",
+    ("pillar_summarizer", "v2", "core42_gpt-6"): _GPT6_TEMP_CAVEAT + "Also never paired in production -- gpt-6 is in no deployment's model enum. Otherwise runs v2's Core42 profile (no system message on this path, truncation logged rather than raised).",
 }
 
 # Combos that don't just lack a production precedent but reliably FAIL. Shown as
@@ -138,6 +167,16 @@ _KNOWN_FAILING_COMBOS = {
         "Expected to fail. Core42 returns the report under \"report\", not \"summary\" -- v1's prompt never "
         "names the key and v1 has no rename fallback, so it fails on attempt 1. v2 fixed both. "
         "Run it to see the failure, or pick v2 / a Gemini model to get output."
+    ),
+    # Same predicted cause as the two above, but stated as a prediction: the
+    # "report"-instead-of-"summary" key was observed on the gpt-5.1/gpt-4.1
+    # deployments, not on gpt-6-sol, which nothing has run through this path yet.
+    # If it happens to emit "summary", this combo will simply succeed and this
+    # entry should be deleted.
+    ("pillar_summarizer", "v1", "core42_gpt-6"): (
+        "Expected to fail, by analogy with the other Core42 models: they return the report under "
+        "\"report\", not \"summary\", and v1's prompt never names the key nor has a rename fallback. "
+        "Unconfirmed for gpt-6 specifically. v2 fixed both -- pick v2 / a Gemini model to get output."
     ),
 }
 

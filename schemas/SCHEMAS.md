@@ -4,6 +4,20 @@ This is the fidelity reference for the runner engine. Everything here was verifi
 
 ---
 
+## ℹ️ Non-production model: `core42_gpt-6`
+
+Everything else in this document describes a model that some Medals-AI deployment actually calls. **`core42_gpt-6` does not** — it appears in no deployment's `model` enum, in either version, and nothing below was verified against it. It is a Prompt Lab-only option, added so a prompt can be benchmarked against it before any decision to adopt it.
+
+The deployment is named **`gpt-6-sol`** on `api.core42.ai` (plain `gpt-6` returns `404 invalid input model`), and it sits behind its own API key. It reuses the v2 Core42 param profile for the use case — `response_format: json_object` where that use case uses it, 16384-token cap, same system-message behavior — with **one forced deviation**, verified against the live endpoint on 2026-10-07:
+
+- **⚠️ Temperature cannot be pinned.** Every other model in this document is pinned to `temperature=0.3`. `gpt-6-sol` rejects that outright: *"Unsupported value: 'temperature' does not support 0.3 with this model. Only the default (1) value is supported."* The kwarg is therefore **omitted** for this model (`CORE42_NO_TEMPERATURE` in `runner/engine.py`) and the call samples at `1`. **Its output is not decoding-equivalent to the other models', so a gpt-6 run is a weaker A/B baseline than gpt-5.1-vs-gpt-4.1** — differences may come from sampling rather than from the prompt. The UI repeats this on every gpt-6 combo.
+- **Token kwarg**, verified: `max_completion_tokens`. Passing `max_tokens` returns *"Unsupported parameter: 'max_tokens' is not supported with this model."*
+- **Pillar Summarizer v1** is flagged expected-to-fail for the same `"report"`-instead-of-`"summary"` reason as the other Core42 models, but that key was only ever observed on `gpt-5.1`/`gpt-4.1`. Unconfirmed for `gpt-6-sol`; if it emits `"summary"` the combo will succeed and the `_KNOWN_FAILING_COMBOS` entry should be dropped.
+
+It is configured separately from the other Core42 deployments (`core42_gpt6_model` / `core42_gpt6_api_key` / `core42_gpt6_base_url`, the latter two falling back to the main `core42_*` values), because it sits behind its own subscription. Leaving `core42_gpt6_model` unset hides it from the UI entirely.
+
+---
+
 ## ⚠️ Provenance note (read this first)
 
 `PROMPT_INVENTORY.md` labels its two sets **v1 = `azure-functions/`** and **v2 = `azure-functions-unified/`**. That's accurate for the *folder path*, but not necessarily for *which branch's version of that folder*:

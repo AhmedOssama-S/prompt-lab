@@ -56,7 +56,25 @@ CORE42_TOKEN_PARAM = {
     "core42_gpt-5.1": "max_completion_tokens",
     "core42_gpt-4.1": "max_tokens",
     "core42_fallback": "max_tokens",
+    # gpt-6 has no production counterpart, but the endpoint is explicit about
+    # this one: passing max_tokens returns "Unsupported parameter: 'max_tokens'
+    # is not supported with this model. Use 'max_completion_tokens' instead."
+    "core42_gpt-6": "max_completion_tokens",
 }
+
+# Core42 deployments that reject an explicit temperature. gpt-6-sol answers a
+# temperature of 0.3 with "Unsupported value: 'temperature' does not support 0.3
+# with this model. Only the default (1) value is supported", so the kwarg is
+# omitted entirely for these and the call runs at the provider default.
+#
+# This is a deliberate, unavoidable break from the fidelity rule the rest of
+# this module follows. Every other model here is pinned to temperature 0.3; gpt-6
+# cannot be, so its output is sampled at 1 and is NOT decoding-equivalent to the
+# others. That makes it a weaker baseline for "which prompt is better" than a
+# gpt-5.1-vs-gpt-4.1 comparison -- the UI says so on every gpt-6 combo, and
+# schemas/SCHEMAS.md records it. There is no production profile to match here
+# anyway, since no deployment calls gpt-6.
+CORE42_NO_TEMPERATURE = {"core42_gpt-6"}
 
 
 class AllRetriesExhaustedError(Exception):
@@ -118,6 +136,25 @@ def setup_clients() -> Dict[str, Dict[str, Any]]:
             clients["core42_gpt-4.1"] = {"client": core42_client, "model": os.environ["core42_gpt41_model"]}
         if os.environ.get("core42_fallback_model"):
             clients["core42_fallback"] = {"client": core42_client, "model": os.environ["core42_fallback_model"]}
+
+    # gpt-6 is a separate Core42 subscription: its own API key, and possibly its
+    # own endpoint. Both fall back to the main Core42 settings above, so a
+    # deployment that serves gpt-6 off the same key/URL only needs the model
+    # name set. Unlike the three above it is NOT a production model -- see
+    # schemas/SCHEMAS.md -- so it is registered purely as a Prompt Lab option.
+    core42_gpt6_model = os.environ.get("core42_gpt6_model")
+    core42_gpt6_key = os.environ.get("core42_gpt6_api_key") or core42_key
+    core42_gpt6_base_url = os.environ.get("core42_gpt6_base_url") or core42_base_url
+    if core42_gpt6_model and core42_gpt6_key and core42_gpt6_base_url:
+        from openai import OpenAI
+        clients["core42_gpt-6"] = {
+            "client": OpenAI(
+                base_url=core42_gpt6_base_url,
+                api_key=core42_gpt6_key,
+                default_headers={"api-key": core42_gpt6_key},
+            ),
+            "model": core42_gpt6_model,
+        }
 
     return clients
 
@@ -205,9 +242,13 @@ def _call_core42(
     kwargs: Dict[str, Any] = {
         "model": client_info["model"],
         "messages": messages,
-        "temperature": temperature,
         "stream": False,
     }
+    # Omitted rather than clamped for the deployments that only accept the
+    # default -- see CORE42_NO_TEMPERATURE. Sending 1 explicitly works too, but
+    # omitting keeps "what this model was actually sent" honest in the trace.
+    if model_key not in CORE42_NO_TEMPERATURE:
+        kwargs["temperature"] = temperature
     kwargs[token_param] = token_limit
     if structured:
         kwargs["response_format"] = {"type": "json_object"}
